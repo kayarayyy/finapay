@@ -9,7 +9,9 @@
     <color name="bright_purple">#8423E4</color>
     <color name="light_purple">#F6ECFE</color>
     <color name="very_light_purple">#FBF7FE</color>
-    <color name="bright_blue">#007bff</color>
+
+    <color name="blue">#007bff</color>
+    <color name="bright_blue">#00c6ff</color>
 
     <!-- Baris 2 -->
     <color name="red">#F84848</color>

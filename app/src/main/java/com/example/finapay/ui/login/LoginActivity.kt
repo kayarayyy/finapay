@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity(){
         val end = start + "Register".length
 
         spannable.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(this, R.color.bright_blue)),
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)),
             start, end,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
