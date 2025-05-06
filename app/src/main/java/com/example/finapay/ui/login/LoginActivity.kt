@@ -2,6 +2,7 @@ package com.example.finapay.ui.login
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -48,8 +49,17 @@ class LoginActivity : AppCompatActivity(){
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    overrideActivityTransition(
+                        OVERRIDE_TRANSITION_OPEN,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                    )
+                } else {
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                }
             }
 
             override fun updateDrawState(ds: TextPaint) {
