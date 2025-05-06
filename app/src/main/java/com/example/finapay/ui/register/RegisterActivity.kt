@@ -86,11 +86,11 @@ class RegisterActivity : AppCompatActivity() {
             user?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.baseline_add_task_24,
+                    iconRes = R.drawable.ic_baseline_add_task_24,
                     title = "Registrasi Berhasil!",
                     message = "Akun kamu sudah terdaftar. Silakan cek email untuk otentikasi.",
                     buttonText = "Kembali Login",
-                    buttonBackgroundRes = R.drawable.bg_button_blue,
+                    buttonBackgroundRes = R.drawable.color_button_blue,
                     iconColor = R.color.blue
                 ) {
                     val intent = Intent(this, LoginActivity::class.java)
@@ -110,11 +110,11 @@ class RegisterActivity : AppCompatActivity() {
             errorMessage?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.baseline_360_24,
+                    iconRes = R.drawable.ic_baseline_360_24,
                     title = "Registrasi Gagal!",
                     message = errorMessage,
                     buttonText = "OK",
-                    buttonBackgroundRes = R.drawable.bg_button_red,
+                    buttonBackgroundRes = R.drawable.color_button_red,
                     iconColor = R.color.red
                 )
             }

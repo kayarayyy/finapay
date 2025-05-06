@@ -14,7 +14,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave2" />
+        android:src="@drawable/graphics_wave2" />
 
     <ImageView
         android:id="@+id/bgWave3"
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave3" />
+        android:src="@drawable/graphics_wave3" />
 
 
 
@@ -79,7 +79,7 @@
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_account_circle_24"
+                app:startIconDrawable="@drawable/ic_outline_account_circle_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -101,7 +101,7 @@
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_email_24"
+                app:startIconDrawable="@drawable/ic_outline_email_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -125,7 +125,7 @@
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_lock_24"
+                app:startIconDrawable="@drawable/ic_outline_lock_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -148,7 +148,7 @@
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_lock_24"
+                app:startIconDrawable="@drawable/ic_outline_lock_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -172,7 +172,7 @@
                     android:id="@+id/btnRegister"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_button_blue"
+                    android:background="@drawable/color_button_blue"
                     android:enabled="true"
                     android:text="Register"
                     android:textColor="@color/white" />

@@ -9,13 +9,11 @@ import android.text.SpannableString
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -106,11 +104,11 @@ class LoginActivity : AppCompatActivity(){
             errorMessage?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.baseline_360_24,
+                    iconRes = R.drawable.ic_baseline_360_24,
                     title = "Login Gagal!",
                     message = errorMessage,
                     buttonText = "OK",
-                    buttonBackgroundRes = R.drawable.bg_button_red,
+                    buttonBackgroundRes = R.drawable.color_button_red,
                     iconColor = R.color.red
                 )
             }

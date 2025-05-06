@@ -14,7 +14,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave1" />
+        android:src="@drawable/graphics_wave1" />
 
     <ImageView
         android:id="@+id/bgWave"
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave" />
+        android:src="@drawable/graphics_wave" />
 
 
 
@@ -79,7 +79,7 @@
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_email_24"
+                app:startIconDrawable="@drawable/ic_outline_email_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -102,7 +102,7 @@
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/blue"
                 app:hintTextColor="@color/blue"
-                app:startIconDrawable="@drawable/outline_lock_24"
+                app:startIconDrawable="@drawable/ic_outline_lock_24"
                 app:startIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -137,7 +137,7 @@
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_button_blue"
+                    android:background="@drawable/color_button_blue"
                     android:enabled="true"
                     android:text="Login"
                     android:textColor="@color/white" />
