@@ -1,4 +1,4 @@
-package com.example.finapay.data.models
+package com.example.finapay.data.models.response
 
 data class ApiResponse<T>(
     val status: String,

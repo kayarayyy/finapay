@@ -15,7 +15,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave1" />
+        android:src="@drawable/bg_wave2" />
 
     <ImageView
         android:id="@+id/bgWave"
@@ -25,7 +25,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_wave" />
+        android:src="@drawable/bg_wave3" />
 
 
 
@@ -65,10 +65,32 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:gravity="center"
-                android:text="Login"
+                android:text="Register"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <!-- Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Name"
+                android:textColorHint="@color/blue"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/blue"
+                app:hintTextColor="@color/blue"
+                app:startIconDrawable="@drawable/outline_account_circle_24"
+                app:startIconTint="@color/blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textColor="@color/blue"
+                    android:textCursorDrawable="@color/blue" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
@@ -96,6 +118,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:hint="Password"
                 android:textColorHint="@color/blue"
                 app:boxBackgroundMode="outline"
@@ -115,32 +138,44 @@
                     android:textCursorDrawable="@color/blue" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Forgot password -->
-            <TextView
-                android:id="@+id/tvForgotPassword"
-                android:layout_width="wrap_content"
+            <!-- Confirm Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="Forgot password?"
-                android:textColor="@color/blue"
-                android:textSize="14sp" />
+                android:hint="Confirm Password"
+                android:textColorHint="@color/blue"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/blue"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/blue"
+                app:hintTextColor="@color/blue"
+                app:startIconDrawable="@drawable/outline_lock_24"
+                app:startIconTint="@color/blue">
 
-            <!-- Button Login -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/blue"
+                    android:textCursorDrawable="@color/blue" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            <!-- Button Register -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp">
 
                 <Button
-                    android:id="@+id/btnLogin"
+                    android:id="@+id/btnRegister"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_button_blue"
                     android:enabled="true"
-                    android:text="Login"
+                    android:text="Register"
                     android:textColor="@color/white" />
 
                 <ProgressBar
@@ -154,14 +189,14 @@
             </FrameLayout>
 
             <TextView
-                android:id="@+id/tvRegisterPrompt"
+                android:id="@+id/tvLoginPrompt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="Don't have an account? Register"
+                android:text="Already have an account? Login"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
         </LinearLayout>

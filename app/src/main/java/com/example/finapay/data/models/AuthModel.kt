@@ -1,6 +1,6 @@
 package com.example.finapay.data.models
 
-data class LoginResponse(
+data class AuthModel(
     val email: String,
     val name: String,
     val role: RoleModel,

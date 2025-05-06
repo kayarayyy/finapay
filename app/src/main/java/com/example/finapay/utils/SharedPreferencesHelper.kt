@@ -2,27 +2,27 @@ package com.example.finapay.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.finapay.data.models.LoginResponse
+import com.example.finapay.data.models.AuthModel
 import com.example.finapay.data.models.RoleModel
 
 class SharedPreferencesHelper(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_pref", Context.MODE_PRIVATE)
 
-    fun saveUserData(loginResponse: LoginResponse) {
+    fun saveUserData(authModel: AuthModel) {
         with(sharedPreferences.edit()) {
-            putString("email", loginResponse.email)
-            putString("name", loginResponse.name)
-            putString("roleName", loginResponse.role.name)
-            putString("roleId", loginResponse.role.id)
-            putString("roleAuthority", loginResponse.role.authority)
-            putString("token", loginResponse.token)
-            putBoolean("is_active", loginResponse.is_active)
-            putStringSet("features", loginResponse.features.toSet())
+            putString("email", authModel.email)
+            putString("name", authModel.name)
+            putString("roleName", authModel.role.name)
+            putString("roleId", authModel.role.id)
+            putString("roleAuthority", authModel.role.authority)
+            putString("token", authModel.token)
+            putBoolean("is_active", authModel.is_active)
+            putStringSet("features", authModel.features.toSet())
             apply()
         }
     }
 
-    fun getUserData(): LoginResponse? {
+    fun getUserData(): AuthModel? {
         val email = sharedPreferences.getString("email", null) ?: return null
         val name = sharedPreferences.getString("name", null) ?: return null
         val roleName = sharedPreferences.getString("roleName", null) ?: return null
@@ -32,7 +32,7 @@ class SharedPreferencesHelper(context: Context) {
         val isActive = sharedPreferences.getBoolean("is_active", false)
         val featuresSet = sharedPreferences.getStringSet("features", emptySet()) ?: emptySet()
 
-        return LoginResponse(
+        return AuthModel(
             email = email,
             name = name,
             role = RoleModel(id = roleId,name = roleName, authority = roleAuthority),
