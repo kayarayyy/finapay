@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="2dp"
+    android:elevation="4dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:layout_marginHorizontal="8dp">
+
+    <RelativeLayout
+        android:id="@+id/card_background"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:padding="16dp">
+
+
+    <!-- Simulasi Chip -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="28dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_chip" />
+
+        <!-- Nama Paket -->
+        <TextView
+            android:id="@+id/tv_plafond_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:text="Paket Premium"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Nomor Acak -->
+        <TextView
+            android:id="@+id/tv_card_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="4111 2233 4455 6677"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:letterSpacing="0.2" />
+
+        <!-- Jumlah Plafond -->
+        <TextView
+            android:id="@+id/tv_plafond_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:text="Rp 100.000.000"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
+

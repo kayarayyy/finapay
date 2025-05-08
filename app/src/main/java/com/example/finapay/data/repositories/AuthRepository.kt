@@ -4,7 +4,7 @@ import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.models.AuthModel
 import com.example.finapay.data.models.requests.LoginRequest
 import com.example.finapay.data.models.requests.RegisterRequest
-import com.example.finapay.data.sources.remote.ApiClient
+import com.example.finapay.data.sources.ApiClient
 import retrofit2.Call
 
 class AuthRepository {

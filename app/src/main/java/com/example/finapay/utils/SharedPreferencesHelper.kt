@@ -18,6 +18,7 @@ class SharedPreferencesHelper(context: Context) {
             putString("token", authModel.token)
             putBoolean("is_active", authModel.is_active)
             putStringSet("features", authModel.features.toSet())
+            putBoolean("alreadyLogin", true)
             apply()
         }
     }
@@ -48,4 +49,16 @@ class SharedPreferencesHelper(context: Context) {
             apply()
         }
     }
+
+    fun setAlreadyLogin(status: Boolean) {
+        with(sharedPreferences.edit()) {
+            putBoolean("alreadyLogin", status)
+            apply()
+        }
+    }
+
+    fun isAlreadyLogin(): Boolean {
+        return sharedPreferences.getBoolean("alreadyLogin", false)
+    }
+
 }
