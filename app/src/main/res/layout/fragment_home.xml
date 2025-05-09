@@ -62,9 +62,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
+                    app:cardBackgroundColor="@color/bright_blue"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/bright_blue"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_user_name">
@@ -82,6 +82,21 @@
                             android:textColor="#757575"
                             android:textSize="14sp" />
 
+
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmer_total"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:shimmer_auto_start="true"
+                            app:shimmer_duration="1000">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="24dp"
+                                android:background="@drawable/bg_skeleton_placeholder" />
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
                         <TextView
                             android:id="@+id/tv_total_plafond"
                             android:layout_width="wrap_content"
@@ -90,7 +105,9 @@
                             android:text="Rp 0"
                             android:textColor="@color/blue"
                             android:textSize="24sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
 
                         <ProgressBar
                             android:id="@+id/progress_limit"
@@ -108,23 +125,62 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
+                            <!-- Shimmer Terpakai di kiri -->
+                            <com.facebook.shimmer.ShimmerFrameLayout
+                                android:id="@+id/shimmer_used"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:shimmer_auto_start="true"
+                                app:shimmer_duration="1000">
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/bg_skeleton_placeholder" />
+                            </com.facebook.shimmer.ShimmerFrameLayout>
+
+                            <!-- TextView Terpakai di kiri -->
                             <TextView
                                 android:id="@+id/tv_used_plafond"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                android:gravity="start"
                                 android:text="Terpakai: Rp 0"
                                 android:textColor="#757575"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:visibility="gone" />
 
+                            <!-- Shimmer Tersedia di kanan -->
+                            <com.facebook.shimmer.ShimmerFrameLayout
+                                android:id="@+id/shimmer_available"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:shimmer_auto_start="true"
+                                app:shimmer_duration="1000">
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/bg_skeleton_placeholder" />
+                            </com.facebook.shimmer.ShimmerFrameLayout>
+
+                            <!-- TextView Tersedia di kanan -->
                             <TextView
                                 android:id="@+id/tv_available_plafond"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="end"
                                 android:text="Tersedia: Rp 0"
                                 android:textColor="#757575"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:visibility="gone" />
                         </LinearLayout>
+
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -136,10 +192,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="-30dp"
                 android:layout_marginEnd="20dp"
+                android:elevation="2dp"
                 app:cardBackgroundColor="@color/bright_blue"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:elevation="2dp">
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -245,179 +301,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Current Loans -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
-                android:text="Pinjaman Aktif"
-                android:textColor="#333333"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="20dp"
-                app:cardBackgroundColor="@color/bright_blue"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:elevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Pinjaman Modal Usaha"
-                            android:textColor="#333333"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/status_bg_active"
-                            android:paddingStart="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="4dp"
-                            android:text="Aktif"
-                            android:textColor="#FFFFFF"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="@color/black" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Total Pinjaman"
-                                android:textColor="#757575"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Rp 25.000.000"
-                                android:textColor="#333333"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tenor"
-                                android:textColor="#757575"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="12 Bulan"
-                                android:textColor="#333333"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Jatuh Tempo"
-                                android:textColor="#757575"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="15 Mei 2025"
-                                android:textColor="#333333"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/btn_detail_loan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@drawable/button_outline_blue"
-                        android:text="Lihat Detail"
-                        android:textAllCaps="false"
-                        android:textColor="@color/blue" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Loan Offers -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
-                android:text="Penawaran Khusus"
-                android:textColor="#333333"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_loan_offers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_loan_offer" />
-
             <!-- Next Payment -->
             <TextView
                 android:layout_width="wrap_content"
@@ -429,85 +312,60 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_next_payment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="4dp">
+
+                <include layout="@layout/item_plafond_skeleton" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_next_payment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_next_payment" />
+
+            <!-- Current Loans -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/light_yellow"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                android:text="Pinjaman Aktif"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_active_loan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="4dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                <include layout="@layout/item_plafond_skeleton" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_active_loan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_active_loan" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Jumlah"
-                                android:textColor="#757575"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Rp 2.325.000"
-                                android:textColor="#333333"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Jatuh Tempo"
-                                android:textColor="#757575"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="15 Mei 2025"
-                                android:textColor="#FF5252"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/btn_pay_now"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@drawable/button_blue_gradient"
-                        android:text="Bayar Sekarang"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

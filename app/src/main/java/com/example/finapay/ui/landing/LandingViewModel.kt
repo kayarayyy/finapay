@@ -42,8 +42,8 @@ class LandingViewModel : ViewModel() {
                         )
                         _plafondsError.postValue(errorResponse?.message ?: "Terjadi kesalahan pada server.")
                     } catch (e: Exception) {
-//                        _plafondsError.postValue("Gagal membaca error dari server." + e )
-                        _plafondsError.postValue(" " + e )
+                        _plafondsError.postValue("Gagal membaca error dari server." + e )
+//                        _plafondsError.postValue(" " + e )
                     }
                 }
             }

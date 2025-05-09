@@ -11,12 +11,14 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.finapay.R
+import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.login.LoginActivity
 import com.example.finapay.utils.CustomDialog
 
@@ -33,6 +35,11 @@ class RegisterActivity : AppCompatActivity() {
         val confirmPasswordField = findViewById<EditText>(R.id.etConfirmPassword)
         val registerButton = findViewById<Button>(R.id.btnRegister)
         val registerProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
+        var bgWave2 = findViewById<ImageView>(R.id.bgWave2)
+        var bgWave3 = findViewById<ImageView>(R.id.bgWave3)
+        val animation = Animation()
+        animation.animationslideleft(bgWave2)
+        animation.animationslideleft(bgWave3, 550)
 
         registerButton.backgroundTintList=null
 

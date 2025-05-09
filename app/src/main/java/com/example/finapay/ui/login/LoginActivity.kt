@@ -10,8 +10,10 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.finapay.MainActivity
 import com.example.finapay.R
+import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.register.RegisterActivity
 import com.example.finapay.utils.CustomDialog
 
@@ -34,6 +37,11 @@ class LoginActivity : AppCompatActivity(){
         val passwordField = findViewById<EditText>(R.id.etPassword)
         val loginButton = findViewById<Button>(R.id.btnLogin)
         val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
+        var bgWave = findViewById<ImageView>(R.id.bgWave)
+        var bgWave1 = findViewById<ImageView>(R.id.bgWave1)
+        val animation = Animation()
+        animation.animationslidebottom(bgWave)
+        animation.animationslidebottom(bgWave1, 550)
 
         loginButton.backgroundTintList=null
 

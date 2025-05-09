@@ -11,10 +11,8 @@ import retrofit2.Callback
 
 class HomeViewModel : ViewModel() {
     private val repository = CustomerDetailsRepository()
-
     private val _customerDetailsSuccess = MutableLiveData<CustomerDetailModel>()
     val customerDetailsSuccess: LiveData<CustomerDetailModel> = _customerDetailsSuccess
-
     private val _customerDetailsError = MutableLiveData<String>()
     val customerDetailsError: LiveData<String> = _customerDetailsError
 

@@ -1,14 +1,16 @@
 package com.example.finapay.data.sources
 
-import com.example.finapay.data.sources.remote.AuthApiService
+import com.example.finapay.data.sources.remote.AuthService
 import com.example.finapay.data.sources.remote.CustomerDetailsService
-import com.example.finapay.data.sources.remote.PlafondApiService
+import com.example.finapay.data.sources.remote.LoanService
+import com.example.finapay.data.sources.remote.PlafondService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://34.72.143.21/api/v1/"
+//    private const val BASE_URL = "http://34.72.143.21/api/v1/"
+    private const val BASE_URL = "https://fc04-114-10-75-150.ngrok-free.app/api/v1/"
 
     private var tokenProvider: (() -> String?)? = null
 
@@ -28,15 +30,19 @@ object ApiClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    val authService: AuthApiService by lazy {
-        retrofit.create(AuthApiService::class.java)
+    val authService: AuthService by lazy {
+        retrofit.create(AuthService::class.java)
     }
 
-    val plafondService: PlafondApiService by lazy {
-        retrofit.create(PlafondApiService::class.java)
+    val plafondService: PlafondService by lazy {
+        retrofit.create(PlafondService::class.java)
     }
 
     val customerDetailsService: CustomerDetailsService by lazy {
         retrofit.create(CustomerDetailsService::class.java)
+    }
+
+    val loanService: LoanService by lazy {
+        retrofit.create(LoanService::class.java)
     }
 }
