@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -16,6 +17,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -24,18 +27,42 @@ import com.example.finapay.R
 import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.register.RegisterActivity
 import com.example.finapay.utils.CustomDialog
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.SignInButton
+import com.google.android.gms.common.api.ApiException
 
 class LoginActivity : AppCompatActivity(){
     private val viewModel: LoginViewModel by viewModels()
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val name = account?.displayName
+            val email = account?.email
+            Toast.makeText(this, "Login Berhasil " + email + " " + name, Toast.LENGTH_SHORT).show()
+        } catch (e: ApiException) {
+            Log.e("GoogleLogin", "Login gagal, code=${e.statusCode}", e)
+            Toast.makeText(this, "Login gagal", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_FINAPay)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+
         val emailField = findViewById<EditText>(R.id.etEmail)
         val passwordField = findViewById<EditText>(R.id.etPassword)
         val loginButton = findViewById<Button>(R.id.btnLogin)
+        val loginGoogleButton = findViewById<SignInButton>(R.id.btn_google_sign_in)
         val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
         var bgWave = findViewById<ImageView>(R.id.bgWave)
         var bgWave1 = findViewById<ImageView>(R.id.bgWave1)
@@ -51,6 +78,13 @@ class LoginActivity : AppCompatActivity(){
 
         val start = fullText.indexOf("Register")
         val end = start + "Register".length
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("1024411678802-hs0qibp02i1rhfv4b3vul454006l7mj5.apps.googleusercontent.com") // Ganti dengan Client ID milikmu
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
@@ -80,6 +114,12 @@ class LoginActivity : AppCompatActivity(){
         textView.text = spannable
         textView.movementMethod = LinkMovementMethod.getInstance()
         textView.highlightColor = Color.TRANSPARENT
+
+
+        loginGoogleButton.setOnClickListener {
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
 
 
         loginButton.setOnClickListener {
@@ -123,4 +163,5 @@ class LoginActivity : AppCompatActivity(){
         }
 
     }
+
 }

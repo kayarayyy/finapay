@@ -142,6 +142,7 @@
                     android:text="Login"
                     android:textColor="@color/white" />
 
+
                 <ProgressBar
                     android:id="@+id/btnProgressBar"
                     style="?android:attr/progressBarStyleSmall"
@@ -150,6 +151,11 @@
                     android:layout_gravity="center"
                     android:indeterminateTint="@color/white"
                     android:visibility="gone" />
+
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/btn_google_sign_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </FrameLayout>
 
             <TextView

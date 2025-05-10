@@ -23,6 +23,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.android.gms.client_id"
+            android:value="1024411678802-hs0qibp02i1rhfv4b3vul454006l7mj5.apps.googleusercontent.com" />
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
