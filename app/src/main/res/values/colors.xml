@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!--  Main Color  -->
+    <color name="blue">#007bff</color>
+    <color name="bright_blue">#00c6ff</color>
+
+    <!-- Baris 1 -->
+    <color name="deep_black">#0A0010</color>
+    <color name="dark_purple">#2E0947</color>
+    <color name="bright_purple">#8423E4</color>
+    <color name="light_purple">#F6ECFE</color>
+    <color name="very_light_purple">#FBF7FE</color>
+
+    <!-- Baris 2 -->
+    <color name="red">#F84848</color>
+    <color name="light_pink">#FDE7E7</color>
+    <color name="muted_purple">#766082</color>
+    <color name="gray_purple">#726B75</color>
+
+    <!-- Baris 3 -->
+    <color name="fuchsia">#F93FD5</color>
+    <color name="pink">#FF7EDF</color>
+    <color name="mint_green">#49FCB1</color>
+    <color name="very_light_green">#EFFFFD</color>
+
+    <!-- Baris 4 -->
+    <color name="light_green">#C8EACF</color>
+    <color name="sky_blue">#C7DEEC</color>
+    <color name="salmon_pink">#F1A8A3</color>
+    <color name="soft_pink">#FEE0E0</color>
+    <color name="baby_pink">#FCC6D3</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+
+    <!-- Additional Colors -->
+    <color name="light_gray">#F5F5F5</color>
+    <color name="gray">#757575</color>
+    <color name="dark_gray">#333333</color>
+    <color name="green">#1DAF25</color>
+    <color name="light_blue">#E6F7FF</color>
+    <color name="soft_yellow">#FFF9C4</color>
+    <color name="light_yellow">#FFEB3B</color>
+</resources>

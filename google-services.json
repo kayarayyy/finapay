@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "630482567435",
+    "project_id": "finapay-86832",
+    "storage_bucket": "finapay-86832.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630482567435:android:fa4085e0a99385ede3220e",
+        "android_client_info": {
+          "package_name": "com.example.finapay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630482567435-17h95ppfv99c1r6v5ihp73npmltbo3oe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWuRlkiVbLcIJUvDj97Xd5t08QMb8h_IA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630482567435-17h95ppfv99c1r6v5ihp73npmltbo3oe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@drawable/bg_gradient_purple_blue">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="32dp">
+
+            <!-- Banner / Logo -->
+            <ImageView
+                android:id="@+id/iv_banner"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/brand"
+                android:contentDescription="Ilustrasi Plafond" />
+
+            <!-- Judul -->
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Temukan Paket Plafond Sesuai Kebutuhanmu"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Subjudul -->
+            <TextView
+                android:id="@+id/tv_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kami menyediakan berbagai pilihan plafond untuk mendukung rencana finansial Anda."
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Skeleton loading -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:padding="4dp">
+
+                <include layout="@layout/item_plafond_skeleton" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <!-- Hint saat gagal load -->
+            <TextView
+                android:id="@+id/tv_reload_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scroll to reload"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Daftar Plafond -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_plafond"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:padding="8dp" />
+
+            <!-- Ajakan Login -->
+            <TextView
+                android:id="@+id/tv_login_prompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login dulu yuk untuk coba simulasi plafon yang cocok buat kamu!"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/color_button_blue"
+                android:text="Login Sekarang!"
+                android:textColor="@color/white"
+                android:elevation="4dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
