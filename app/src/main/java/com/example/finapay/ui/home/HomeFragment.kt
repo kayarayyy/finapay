@@ -1,11 +1,14 @@
 package com.example.finapay.ui.home
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -20,6 +23,8 @@ import com.example.finapay.data.models.LoanModel
 import com.example.finapay.data.models.PaymentModel
 import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
+import com.example.finapay.ui.request.RequestActivity
+import com.example.finapay.ui.simulation.SimulationActivity
 import com.facebook.shimmer.ShimmerFrameLayout
 
 class HomeFragment : Fragment() {
@@ -37,7 +42,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
 
 //        View Model
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
@@ -55,6 +60,18 @@ class HomeFragment : Fragment() {
         val tvTotalPlafond = view.findViewById<TextView>(R.id.tv_total_plafond)
         val tvUsedPlafond = view.findViewById<TextView>(R.id.tv_used_plafond)
         val tvAvailablePlafond = view.findViewById<TextView>(R.id.tv_available_plafond)
+
+//        Clickable as Button
+        val ivSimulation = view.findViewById<ImageView>(R.id.iv_simulation)
+        val ivRequest = view.findViewById<ImageView>(R.id.iv_request)
+        ivSimulation.setOnClickListener {
+            val intent = Intent(requireContext(), SimulationActivity::class.java)
+            startActivity(intent)
+        }
+        ivRequest.setOnClickListener {
+            val intent = Intent(requireContext(), RequestActivity::class.java)
+            startActivity(intent)
+        }
 
 //        Layout Manager
         val lmActiveLoan = LinearLayoutManager(this@HomeFragment.requireContext(),
@@ -106,6 +123,11 @@ class HomeFragment : Fragment() {
             rvNextPayment.visibility = View.GONE
             viewModel.getCustomerDetails()
         }
+
+//        btnSimulation.setOnClickListener {
+//            val intent = Intent(requireContext(), SimulationActivity::class.java)
+//            startActivity(intent)
+//        }
 
         // Observasi hasil dari ViewModel
         viewModel.customerDetailsSuccess.observe(viewLifecycleOwner) { customer ->

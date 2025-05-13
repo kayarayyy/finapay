@@ -59,6 +59,7 @@ class LoginActivity : AppCompatActivity(){
     ) { result ->
         val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
         val loginButton = findViewById<Button>(R.id.btnLogin)
+        Log.d("GoogleLogin", "res code: ${result.resultCode} & ${result.data}")
 
         if (result.resultCode == RESULT_OK && result.data != null) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)

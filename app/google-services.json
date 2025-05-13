@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "630482567435-17h95ppfv99c1r6v5ihp73npmltbo3oe.apps.googleusercontent.com",
+          "client_id": "630482567435-86iksv9ka5lvq5ivf5glodkbmrmt8ma9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.finapay",
+            "certificate_hash": "e87efb5fa10e395e774ed58d8c1283e3624e521a"
+          }
+        },
+        {
+          "client_id": "630482567435-4ck2eqarg55ua42v9g2d2gmj5kgphfv5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

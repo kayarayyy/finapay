@@ -42,6 +42,8 @@
         <activity android:name=".ui.login.LoginActivity" />
         <activity android:name=".ui.register.RegisterActivity" />
         <activity android:name=".ui.landing.LandingActivity" />
+        <activity android:name=".ui.simulation.SimulationActivity" />
+        <activity android:name=".ui.request.RequestActivity" />
     </application>
 
 </manifest>
