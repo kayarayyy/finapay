@@ -93,7 +93,7 @@ class HomeFragment() : Fragment() {
             } else {
                 CustomDialog.show(
                     context = this@HomeFragment.requireContext(),
-                    iconRes = R.drawable.ic_baseline_360_24,
+                    iconRes = R.drawable.ic_outline_account_circle_24,
                     title = "Data Belum Lengkap!",
                     message = "Lengkapi data anda untuk mengajukan pinjaman",
                     primaryButtonText = "Lengkapi Data",

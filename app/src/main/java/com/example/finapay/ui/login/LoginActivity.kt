@@ -209,7 +209,7 @@ class LoginActivity : AppCompatActivity(){
             errorMessage?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.ic_baseline_360_24,
+                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
                     title = "Login Gagal!",
                     message = errorMessage,
                     primaryButtonText = "OK",

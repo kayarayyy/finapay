@@ -92,7 +92,7 @@ class RegisterActivity : AppCompatActivity() {
             user?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.ic_baseline_add_task_24,
+                    iconRes = R.drawable.ic_outline_check_circle_24,
                     title = "Registrasi Berhasil!",
                     message = "Akun kamu sudah terdaftar. Silakan cek email untuk otentikasi.",
                     primaryButtonText = "Kembali Login",
@@ -116,7 +116,7 @@ class RegisterActivity : AppCompatActivity() {
             errorMessage?.let {
                 CustomDialog.show(
                     context = this,
-                    iconRes = R.drawable.ic_baseline_360_24,
+                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
                     title = "Registrasi Gagal!",
                     message = errorMessage,
                     primaryButtonText = "OK",

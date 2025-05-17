@@ -69,7 +69,7 @@
                     android:id="@+id/iv_notification"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/outline_announcement_24"
+                    android:src="@drawable/ic_outline_circle_notifications_24"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tv_welcome"
                     app:tint="#FFFFFF" />
@@ -233,7 +233,7 @@
                             android:layout_height="48dp"
                             android:background="@drawable/bg_circle_light_blue"
                             android:padding="12dp"
-                            android:src="@drawable/ic_ajukan"
+                            android:src="@drawable/ic_outline_add_card_24"
                             android:clickable="true"
                             android:focusable="true"/>
 
@@ -308,7 +308,7 @@
                             android:layout_height="48dp"
                             android:background="@drawable/bg_circle_light_blue"
                             android:padding="12dp"
-                            android:src="@drawable/ic_baseline_360_24"
+                            android:src="@drawable/ic_outline_assignment_24"
                             android:clickable="true"
                             android:focusable="true"
                             />
