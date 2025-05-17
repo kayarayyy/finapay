@@ -30,16 +30,19 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
-        val btnLogout = view.findViewById<Button>(R.id.btnLogout)
+        // Initialize Views
+        val btnLogout = view.findViewById<Button>(R.id.btn_logout)
+        val btnChangeAvatar = view.findViewById<Button>(R.id.btn_change_avatar)
         val tvName = view.findViewById<TextView>(R.id.tv_name)
         val tvEmail = view.findViewById<TextView>(R.id.tv_email)
         val layoutAccount = view.findViewById<LinearLayout>(R.id.tv_account)
         val layoutSetting = view.findViewById<LinearLayout>(R.id.tv_settings)
 
-
+        // Ensure button tint is not altered
         btnLogout.backgroundTintList = null
+        btnChangeAvatar.backgroundTintList = null
 
-        // Observasi data dari ViewModel
+        // Observe data from ViewModel
         viewModel.name.observe(viewLifecycleOwner) { name ->
             tvName.text = name
         }
@@ -48,29 +51,56 @@ class ProfileFragment : Fragment() {
             tvEmail.text = email
         }
 
-        // Aksi logout
+        // Set click listeners
         btnLogout.setOnClickListener {
-            CustomDialog.show(
-                context = this@ProfileFragment.requireContext(),
-                iconRes = R.drawable.ic_baseline_360_24,
-                title = "Logout",
-                message = "Anda yakin ingin keluar?!",
-                primaryButtonText = "OK",
-                primaryButtonBackgroundRes = R.drawable.color_button_red,
-                secondaryButtonText = "Batal",
-                secondaryButtonBackgroundRes = R.drawable.color_button_gray,
-                onPrimaryClick = { logout() },
-                iconColor = R.color.red
-            )
-        }
-        layoutAccount.setOnClickListener {
-            val intent = Intent(requireContext(), MyAccountActivity::class.java)
-            startActivity(intent)
-        }
-        layoutSetting.setOnClickListener {
-            Toast.makeText(this@ProfileFragment.requireContext(), "Pengaturan diklik", Toast.LENGTH_SHORT).show()
+            showLogoutDialog()
         }
 
+        layoutAccount.setOnClickListener {
+            navigateToMyAccount()
+        }
+
+        layoutSetting.setOnClickListener {
+            showSettingsToast()
+        }
+    }
+
+    private fun showLogoutDialog() {
+        CustomDialog.show(
+            context = requireContext(),
+            iconRes = R.drawable.ic_baseline_error_outline_24,
+            title = "Keluar",
+            message = "Anda yakin ingin keluar dari aplikasi?",
+            primaryButtonText = "Keluar",
+            primaryButtonBackgroundRes = R.drawable.color_button_red,
+            secondaryButtonText = "Batal",
+            secondaryButtonBackgroundRes = R.drawable.color_button_gray,
+            onPrimaryClick = { logout() },
+            iconColor = R.color.red
+        )
+    }
+
+    private fun navigateToMyAccount() {
+        val intent = Intent(requireContext(), MyAccountActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun showSettingsToast() {
+        Toast.makeText(requireContext(), "Pengaturan diklik", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun navigateToHelp() {
+        // Uncomment when HelpActivity is created
+        // val intent = Intent(requireContext(), HelpActivity::class.java)
+        // startActivity(intent)
+        Toast.makeText(requireContext(), "Bantuan diklik", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun navigateToAbout() {
+        // Uncomment when AboutActivity is created
+        // val intent = Intent(requireContext(), AboutActivity::class.java)
+        // startActivity(intent)
+        Toast.makeText(requireContext(), "Tentang Aplikasi diklik", Toast.LENGTH_SHORT).show()
     }
 
     private fun logout() {

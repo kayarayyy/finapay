@@ -215,14 +215,14 @@ class MyAccountActivity : AppCompatActivity() {
     private fun showImagePickerDialog() {
         CustomDialog.show(
             context = this,
-            iconRes = R.drawable.ic_baseline_360_24,
+            iconRes = R.drawable.ic_outline_image_24,
             title = "Upload Gambar!",
             message = "Pilih sumber gambar",
             primaryButtonText = "Ambil dari Kamera",
             primaryButtonBackgroundRes = R.drawable.color_button_blue,
             secondaryButtonText = "Ambil dari Galeri",
             secondaryButtonBackgroundRes = R.drawable.color_button_red,
-            iconColor = R.color.red,
+            iconColor = R.color.blue,
             onPrimaryClick = { openCamera() },
             onSecondaryClick = { openGallery() }
         )

@@ -2,6 +2,7 @@ package com.example.finapay.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.finapay.R
+
 
 object CustomDialog {
     fun show(
@@ -38,9 +40,20 @@ object CustomDialog {
         val btnPrimary = dialogView.findViewById<Button>(R.id.btnPrimary)
         val btnSecondary = dialogView.findViewById<Button>(R.id.btnSecondary)
 
-        icon.setImageDrawable(ContextCompat.getDrawable(context, iconRes)?.apply {
-            iconColor?.let { setTint(it) }
-        })
+        // Clear any previous tints
+        icon.clearColorFilter()
+        icon.backgroundTintList = null
+
+        // Set the icon drawable
+        icon.setImageResource(iconRes)
+
+        // Apply color tint if provided
+        iconColor?.let {
+            // Use ContextCompat to get the color from the resource
+            val colorValue = ContextCompat.getColor(context, it)
+            icon.setColorFilter(colorValue, PorterDuff.Mode.SRC_IN)
+        }
+
         tvTitle.text = title
         tvMessage.text = message
 

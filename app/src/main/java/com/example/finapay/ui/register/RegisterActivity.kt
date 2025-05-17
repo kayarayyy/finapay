@@ -37,8 +37,8 @@ class RegisterActivity : AppCompatActivity() {
         var bgWave2 = findViewById<ImageView>(R.id.bgWave2)
         var bgWave3 = findViewById<ImageView>(R.id.bgWave3)
         val animation = Animation()
-        animation.animationslideleft(bgWave2)
-        animation.animationslideleft(bgWave3, 550)
+        animation.animationslidebottom(bgWave2, 550)
+        animation.animationslidebottom(bgWave3)
 
         registerButton.backgroundTintList=null
 
