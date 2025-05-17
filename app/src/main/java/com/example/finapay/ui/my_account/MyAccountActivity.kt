@@ -17,6 +17,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.ImageView
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,14 +51,28 @@ class MyAccountActivity : AppCompatActivity() {
     private lateinit var locationErrorTextView: TextView
 
     // Views: EditText
+    private lateinit var nikInput: TextInputEditText
     private lateinit var ttlInput: TextInputEditText
+    private lateinit var phoneInput: TextInputEditText
+    private lateinit var mothersNameInput: TextInputEditText
+    private lateinit var jobInput: TextInputEditText
     private lateinit var salaryInput: TextInputEditText
+    private lateinit var accountInput: TextInputEditText
+    private lateinit var houseStatusInput: TextInputEditText
+    private lateinit var streetInput: TextInputEditText
+    private lateinit var districtInput: TextInputEditText
+    private lateinit var provinceInput: TextInputEditText
+    private lateinit var postalCodeInput: TextInputEditText
+
+    // Views: Radio Group
+    private lateinit var genderRadioGroup: RadioGroup
 
     // Views: Button
     private lateinit var refreshLocationButton: MaterialButton
     private lateinit var uploadKtpButton: MaterialButton
     private lateinit var uploadSelfieButton: MaterialButton
     private lateinit var uploadHouseButton: MaterialButton
+    private lateinit var submitButton: MaterialButton
 
     // Views: ImageView & CardView
     private lateinit var ktpPreview: ImageView
@@ -78,6 +94,7 @@ class MyAccountActivity : AppCompatActivity() {
 
     // Enums
     private enum class ImageType { KTP, SELFIE, HOUSE }
+
     private var selectedImageType: ImageType? = null
 
     private var pendingLocationRequest = false
@@ -96,6 +113,7 @@ class MyAccountActivity : AppCompatActivity() {
             selectedImageType = ImageType.KTP
             showImagePickerDialog()
         }
+
         uploadSelfieButton.setOnClickListener {
             selectedImageType = ImageType.SELFIE
             showImagePickerDialog()
@@ -131,18 +149,82 @@ class MyAccountActivity : AppCompatActivity() {
             Toast.makeText(this, "Gagal memuat data: $error", Toast.LENGTH_LONG).show()
         }
 
+        submitButton.setOnClickListener {
+            val nik = nikInput.text.toString()
+            val selectedGenderId = genderRadioGroup.checkedRadioButtonId
+            val gender = if (selectedGenderId != -1) {
+                findViewById<RadioButton>(selectedGenderId).text.toString()
+            } else {
+                "Belum dipilih"
+            }
+            val ttl = ttlInput.text.toString()
+            val phone = phoneInput.text.toString()
+            val mothersName = mothersNameInput.text.toString()
+            val job = jobInput.text.toString()
+            val salary = salaryInput.text.toString()
+            val account = accountInput.text.toString()
+            val houseStatus = houseStatusInput.text.toString()
+            val street = streetInput.text.toString()
+            val district = districtInput.text.toString()
+            val province = provinceInput.text.toString()
+            val zipCode = postalCodeInput.text.toString()
+            val ktp = ktpUri?.toString()
+            val selfie = selfieUri?.toString()
+            val house = houseUri?.toString()
+
+            val message = """
+                        NIK: $nik
+                        Gender: $gender
+                        TTL: $ttl
+                        Phone: $phone
+                        Nama Ibu: $mothersName
+                        Pekerjaan: $job
+                        Gaji: $salary
+                        No Rekening: $account
+                        Status Rumah: $houseStatus
+                        Jalan: $street
+                        Kecamatan: $district
+                        Provinsi: $province
+                        Kode Pos: $zipCode
+                        KTP: $ktp
+                        Selfie: $selfie
+                        Rumah: $house
+                    """.trimIndent()
+
+            CustomDialog.show(
+                context = this,
+                iconRes = R.drawable.ic_outline_image_24,
+                title = "Submit?!",
+                message = message,
+                iconColor = R.color.blue,
+            )
+        }
+
+
         viewModel.getCustomerDetails()
     }
 
     private fun initViews() {
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
+        nikInput = findViewById(R.id.nik_input)
         ttlInput = findViewById(R.id.ttl_input)
+        phoneInput = findViewById(R.id.phone_input)
+        mothersNameInput = findViewById(R.id.mothers_name_input)
+        jobInput = findViewById(R.id.job_input)
         salaryInput = findViewById(R.id.salary_input)
+        accountInput = findViewById(R.id.account_input)
+        houseStatusInput = findViewById(R.id.house_status_input)
+        streetInput = findViewById(R.id.street_input)
+        districtInput = findViewById(R.id.district_input)
+        provinceInput = findViewById(R.id.province_input)
+        postalCodeInput = findViewById(R.id.postal_code_input)
         refreshLocationButton = findViewById(R.id.refresh_location_button)
         uploadKtpButton = findViewById(R.id.upload_ktp_button)
         uploadSelfieButton = findViewById(R.id.upload_selfie_ktp_button)
         uploadHouseButton = findViewById(R.id.upload_house_button)
+        submitButton = findViewById(R.id.submit_button)
+        genderRadioGroup = findViewById(R.id.gender_group)
         ktpPreview = findViewById(R.id.ktp_preview)
         ktpPreviewCard = findViewById(R.id.ktp_preview_card)
         selfiePreview = findViewById(R.id.selfie_ktp_preview)
@@ -161,28 +243,30 @@ class MyAccountActivity : AppCompatActivity() {
     }
 
     private fun checkLocationPermissionAndFetch() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             getLastLocation()
         } else {
             pendingLocationRequest = true
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_CODE)
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_CODE
+            )
         }
     }
 
 
     private fun showPermissionSettingsDialog(permissionName: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Izin Diperlukan")
+        AlertDialog.Builder(this).setTitle("Izin Diperlukan")
             .setMessage("Izin $permissionName diperlukan untuk fitur ini. Aktifkan secara manual di pengaturan aplikasi.")
             .setPositiveButton("Pengaturan") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", packageName, null)
                 intent.data = uri
                 startActivity(intent)
-            }
-            .setNegativeButton("Batal", null)
-            .show()
+            }.setNegativeButton("Batal", null).show()
     }
 
 
@@ -224,19 +308,18 @@ class MyAccountActivity : AppCompatActivity() {
             secondaryButtonBackgroundRes = R.drawable.color_button_red,
             iconColor = R.color.blue,
             onPrimaryClick = { openCamera() },
-            onSecondaryClick = { openGallery() }
-        )
+            onSecondaryClick = { openGallery() })
     }
 
     private fun openCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             pendingCameraRequest = true
             ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION_CODE
+                this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE
             )
         } else {
             launchCamera()
@@ -283,9 +366,7 @@ class MyAccountActivity : AppCompatActivity() {
 
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -323,16 +404,19 @@ class MyAccountActivity : AppCompatActivity() {
                 ktpPreview.setImageURI(uri)
                 ktpPreviewCard.visibility = View.VISIBLE
             }
+
             ImageType.SELFIE -> {
                 selfieUri = uri
                 selfiePreview.setImageURI(uri)
                 selfiePreviewCard.visibility = View.VISIBLE
             }
+
             ImageType.HOUSE -> {
                 houseUri = uri
                 housePreview.setImageURI(uri)
                 housePreviewCard.visibility = View.VISIBLE
             }
+
             else -> {
                 Toast.makeText(this, "Jenis gambar tidak diketahui", Toast.LENGTH_SHORT).show()
             }
@@ -346,12 +430,11 @@ class MyAccountActivity : AppCompatActivity() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(
-            this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = String.format("%02d-%02d-%04d", selectedDay, selectedMonth + 1, selectedYear)
+            this, { _, selectedYear, selectedMonth, selectedDay ->
+                val formattedDate =
+                    String.format("%02d-%02d-%04d", selectedDay, selectedMonth + 1, selectedYear)
                 ttlInput.setText(formattedDate)
-            },
-            year, month, day
+            }, year, month, day
         )
 
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
