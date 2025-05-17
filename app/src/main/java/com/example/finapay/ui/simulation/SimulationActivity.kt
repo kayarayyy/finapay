@@ -19,7 +19,6 @@ class SimulationActivity : AppCompatActivity() {
     private lateinit var adapter: PlafondAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_FINAPay)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_simulation)
 

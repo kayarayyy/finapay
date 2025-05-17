@@ -25,7 +25,6 @@ import com.example.finapay.utils.CustomDialog
 class RegisterActivity : AppCompatActivity() {
     private val viewModel: RegisterViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_FINAPay)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 

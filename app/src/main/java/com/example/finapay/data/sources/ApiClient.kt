@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
 //    private const val BASE_URL = "http://localhost:8080/api/v1/"
-    private const val BASE_URL = "http://104.197.83.115/api/v1/"
+    private const val BASE_URL = "http://34.60.203.63/api/v1/"
 //    private const val BASE_URL = "https://db00-120-188-4-242.ngrok-free.app/api/v1/"
 
     private var tokenProvider: (() -> String?)? = null

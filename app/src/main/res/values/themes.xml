@@ -4,7 +4,16 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorOnSurface">@color/blue</item>
+        <item name="colorPrimary">@color/blue</item>
     </style>
 
-    <style name="Theme.FINAPay" parent="Base.Theme.FINAPay" />
+    <style name="Theme.FINAPay" parent="Base.Theme.FINAPay" >
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorOnSurface">@color/blue</item>
+        <item name="colorPrimary">@color/bright_blue</item>
+    </style>
 </resources>

@@ -6,11 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.finapay.R
 import com.example.finapay.ui.login.LoginActivity
+import com.example.finapay.ui.my_account.MyAccountActivity
 import com.example.finapay.utils.SharedPreferencesHelper
 
 class ProfileFragment : Fragment() {
@@ -29,6 +32,9 @@ class ProfileFragment : Fragment() {
         val btnLogout = view.findViewById<Button>(R.id.btnLogout)
         val tvName = view.findViewById<TextView>(R.id.tv_name)
         val tvEmail = view.findViewById<TextView>(R.id.tv_email)
+        val layoutAccount = view.findViewById<LinearLayout>(R.id.tv_account)
+        val layoutSetting = view.findViewById<LinearLayout>(R.id.tv_settings)
+
 
         btnLogout.backgroundTintList = null
 
@@ -56,12 +62,19 @@ class ProfileFragment : Fragment() {
                 goToLogin()
             }
         }
-
-
-    }
-        private fun goToLogin() {
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        layoutAccount.setOnClickListener {
+            val intent = Intent(requireContext(), MyAccountActivity::class.java)
             startActivity(intent)
         }
+        layoutSetting.setOnClickListener {
+            Toast.makeText(this@ProfileFragment.requireContext(), "Pengaturan diklik", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    private fun goToLogin() {
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+    }
 }

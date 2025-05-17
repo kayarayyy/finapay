@@ -1,17 +1,21 @@
 package com.example.finapay.ui.home
 
+import android.app.Application
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,13 +29,16 @@ import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
 import com.example.finapay.ui.request.RequestActivity
 import com.example.finapay.ui.simulation.SimulationActivity
+import com.example.finapay.utils.SharedPreferencesHelper
 import com.facebook.shimmer.ShimmerFrameLayout
 
-class HomeFragment : Fragment() {
+class HomeFragment() : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var adapterActiveLoan: ActiveLoanAdapter
     private lateinit var adapterPayment: PaymentAdapter
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -41,6 +48,12 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            val controller = WindowCompat.getInsetsController(requireActivity().window, requireView())
+            controller?.show(WindowInsetsCompat.Type.statusBars())
+        }
+
+        sharedPreferencesHelper = SharedPreferencesHelper(requireContext())
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
 
@@ -205,7 +218,8 @@ class HomeFragment : Fragment() {
 
             shimmerName.stopShimmer()
             shimmerName.visibility = View.GONE
-            tvUserName.setText("-")
+            val user = sharedPreferencesHelper.getUserData()
+            tvUserName.setText(user?.name ?: "-")
             // TODO: Tampilkan pesan error, misal pakai Toast
             Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
         }
