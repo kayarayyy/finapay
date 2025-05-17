@@ -35,12 +35,17 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import java.util.Calendar
 
 class MyAccountActivity : AppCompatActivity() {
 
     // ViewModel
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: MyAccountViewModel by viewModels()
 
     // Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -73,6 +78,9 @@ class MyAccountActivity : AppCompatActivity() {
     private lateinit var uploadSelfieButton: MaterialButton
     private lateinit var uploadHouseButton: MaterialButton
     private lateinit var submitButton: MaterialButton
+
+//    Views : Progress Bar
+    private lateinit var progressBar: View
 
     // Views: ImageView & CardView
     private lateinit var ktpPreview: ImageView
@@ -141,70 +149,126 @@ class MyAccountActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.customerDetailsSuccess.observe(this) {
-            Toast.makeText(this, "Berhasil Memuat data", Toast.LENGTH_LONG).show()
-        }
-
-        viewModel.customerDetailsError.observe(this) { error ->
-            Toast.makeText(this, "Gagal memuat data: $error", Toast.LENGTH_LONG).show()
-        }
-
         submitButton.setOnClickListener {
-            val nik = nikInput.text.toString()
-            val selectedGenderId = genderRadioGroup.checkedRadioButtonId
-            val gender = if (selectedGenderId != -1) {
-                findViewById<RadioButton>(selectedGenderId).text.toString()
-            } else {
-                "Belum dipilih"
-            }
-            val ttl = ttlInput.text.toString()
-            val phone = phoneInput.text.toString()
-            val mothersName = mothersNameInput.text.toString()
-            val job = jobInput.text.toString()
-            val salary = salaryInput.text.toString()
-            val account = accountInput.text.toString()
-            val houseStatus = houseStatusInput.text.toString()
-            val street = streetInput.text.toString()
-            val district = districtInput.text.toString()
-            val province = provinceInput.text.toString()
-            val zipCode = postalCodeInput.text.toString()
-            val ktp = ktpUri?.toString()
-            val selfie = selfieUri?.toString()
-            val house = houseUri?.toString()
-
-            val message = """
-                        NIK: $nik
-                        Gender: $gender
-                        TTL: $ttl
-                        Phone: $phone
-                        Nama Ibu: $mothersName
-                        Pekerjaan: $job
-                        Gaji: $salary
-                        No Rekening: $account
-                        Status Rumah: $houseStatus
-                        Jalan: $street
-                        Kecamatan: $district
-                        Provinsi: $province
-                        Kode Pos: $zipCode
-                        KTP: $ktp
-                        Selfie: $selfie
-                        Rumah: $house
-                    """.trimIndent()
-
-            CustomDialog.show(
-                context = this,
-                iconRes = R.drawable.ic_outline_image_24,
-                title = "Submit?!",
-                message = message,
-                iconColor = R.color.blue,
-            )
+            submitData()
         }
 
+        observeViewModel()
 
-        viewModel.getCustomerDetails()
     }
 
+    private fun observeViewModel() {
+        viewModel.error.observe(this) { error ->
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+        }
+        viewModel.isLoading.observe(this) { isLoading ->
+            // TODO: tampilkan/hilangkan loading indicator
+            if (isLoading) {
+                progressBar.visibility = View.VISIBLE
+                submitButton.text = ""
+            } else {
+                progressBar.visibility = View.GONE
+                submitButton.text = "Submit"
+            }
+        }
+        viewModel.customerDetails.observe(this) { customerDetails ->
+            // TODO: tampilkan data pelanggan
+            Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun submitData() {
+        val nik = nikInput.text.toString()
+        val selectedGenderId = genderRadioGroup.checkedRadioButtonId
+        val gender = when (selectedGenderId) {
+            R.id.gender_male -> "LAKI_LAKI"
+            R.id.gender_female -> "PEREMPUAN"
+            else -> "Belum dipilih"
+        }
+        val ttl = ttlInput.text.toString()
+        val phone = phoneInput.text.toString()
+        val mothersName = mothersNameInput.text.toString()
+        val job = jobInput.text.toString()
+        val salary = salaryInput.text.toString()
+        val account = accountInput.text.toString()
+        val houseStatus = houseStatusInput.text.toString()
+        val street = streetInput.text.toString()
+        val district = districtInput.text.toString()
+        val province = provinceInput.text.toString()
+        val zipCode = postalCodeInput.text.toString()
+        val ktp = ktpUri
+        val selfie = selfieUri
+        val house = houseUri
+
+        // Konversi ke RequestBody
+        fun String.toRequestBody() = toRequestBody("text/plain".toMediaTypeOrNull())
+
+        // Contoh latitude dan longitude (harus diganti dengan nilai dari GPS-mu)
+        val latitude = (currentLat ?: 0.0).toString()
+        val longitude = (currentLon ?: 0.0).toString()
+
+        // Konversi file URI ke Multipart
+        fun uriToMultipart(name: String, uri: Uri?): MultipartBody.Part? {
+            uri ?: return null
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val fileBytes = inputStream.readBytes()
+            val requestFile = fileBytes.toRequestBody("image/*".toMediaTypeOrNull())
+            return MultipartBody.Part.createFormData(name, "image.jpg", requestFile)
+        }
+
+        if (currentLat == null || currentLon == null) {
+            Toast.makeText(this, "Silakan perbarui lokasi terlebih dahulu", Toast.LENGTH_SHORT)
+                .show()
+
+        }
+
+        val ktpPart = uriToMultipart("ktp", ktp)
+        val selfiePart = uriToMultipart("selfieKtp", selfie)
+        val housePart = uriToMultipart("house", house)
+
+        if (ktpPart == null || selfiePart == null || housePart == null) {
+            Toast.makeText(this, "Semua gambar harus diisi", Toast.LENGTH_SHORT).show()
+
+        }
+
+        CustomDialog.show(
+            context = this,
+            iconRes = R.drawable.ic_outline_image_24,
+            title = "Submit",
+            message = "Pastikan data anda sudah terisi dengan benar",
+            primaryButtonText = "Ya",
+            primaryButtonBackgroundRes = R.drawable.color_button_blue,
+            secondaryButtonText = "Batal",
+            secondaryButtonBackgroundRes = R.drawable.color_button_gray,
+            onPrimaryClick = {
+                viewModel.submitCustomerDetails(
+                    street.toRequestBody(),
+                    district.toRequestBody(),
+                    province.toRequestBody(),
+                    zipCode.toRequestBody(),
+                    latitude.toRequestBody(),
+                    longitude.toRequestBody(),
+                    gender.toRequestBody(),
+                    ttl.toRequestBody(),
+                    phone.toRequestBody(),
+                    nik.toRequestBody(),
+                    mothersName.toRequestBody(),
+                    job.toRequestBody(),
+                    salary.toRequestBody(),
+                    account.toRequestBody(),
+                    houseStatus.toRequestBody(),
+                    selfiePart!!,
+                    housePart!!,
+                    ktpPart!!
+                )
+            },
+            iconColor = R.color.blue,
+        )
+    }
+
+
     private fun initViews() {
+        progressBar = findViewById(R.id.loading_indicator)
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
         nikInput = findViewById(R.id.nik_input)
