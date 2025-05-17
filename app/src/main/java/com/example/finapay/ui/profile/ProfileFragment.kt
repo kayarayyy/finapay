@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.finapay.R
 import com.example.finapay.ui.login.LoginActivity
 import com.example.finapay.ui.my_account.MyAccountActivity
+import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.SharedPreferencesHelper
 
 class ProfileFragment : Fragment() {
@@ -49,18 +50,18 @@ class ProfileFragment : Fragment() {
 
         // Aksi logout
         btnLogout.setOnClickListener {
-            val sharedPrefHelper = SharedPreferencesHelper(requireContext())
-            val fcmToken = sharedPrefHelper.getFcmToken()
-
-            sharedPrefHelper.clearUserData()
-
-            if (fcmToken != null) {
-                viewModel.logout(fcmToken) { success ->
-                    goToLogin()
-                }
-            } else {
-                goToLogin()
-            }
+            CustomDialog.show(
+                context = this@ProfileFragment.requireContext(),
+                iconRes = R.drawable.ic_baseline_360_24,
+                title = "Logout",
+                message = "Anda yakin ingin keluar?!",
+                primaryButtonText = "OK",
+                primaryButtonBackgroundRes = R.drawable.color_button_red,
+                secondaryButtonText = "Batal",
+                secondaryButtonBackgroundRes = R.drawable.color_button_gray,
+                onPrimaryClick = { logout() },
+                iconColor = R.color.red
+            )
         }
         layoutAccount.setOnClickListener {
             val intent = Intent(requireContext(), MyAccountActivity::class.java)
@@ -70,6 +71,21 @@ class ProfileFragment : Fragment() {
             Toast.makeText(this@ProfileFragment.requireContext(), "Pengaturan diklik", Toast.LENGTH_SHORT).show()
         }
 
+    }
+
+    private fun logout() {
+        val sharedPrefHelper = SharedPreferencesHelper(requireContext())
+        val fcmToken = sharedPrefHelper.getFcmToken()
+
+        sharedPrefHelper.clearUserData()
+
+        if (fcmToken != null) {
+            viewModel.logout(fcmToken) { success ->
+                goToLogin()
+            }
+        } else {
+            goToLogin()
+        }
     }
 
     private fun goToLogin() {

@@ -3,6 +3,7 @@ package com.example.finapay.utils
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -13,17 +14,20 @@ object CustomDialog {
     fun show(
         context: Context,
         iconRes: Int,
-        iconColor: Int?,
+        iconColor: Int? = null,
         title: String,
         message: String,
-        buttonText: String,
-        buttonBackgroundRes: Int, // ini drawable, bukan warna
-        onClick: (() -> Unit)? = null
+        primaryButtonText: String? = null,
+        primaryButtonBackgroundRes: Int? = null,
+        onPrimaryClick: (() -> Unit)? = null,
+        secondaryButtonText: String? = null,
+        secondaryButtonBackgroundRes: Int? = null,
+        onSecondaryClick: (() -> Unit)? = null,
     ) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.custom_dialog, null)
         val dialog = AlertDialog.Builder(context)
             .setView(dialogView)
-            .setCancelable(false)
+            .setCancelable(true)
             .create()
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
@@ -31,25 +35,45 @@ object CustomDialog {
         val icon = dialogView.findViewById<ImageView>(R.id.dialogIcon)
         val tvTitle = dialogView.findViewById<TextView>(R.id.dialogTitle)
         val tvMessage = dialogView.findViewById<TextView>(R.id.dialogMessage)
-        val btnAction = dialogView.findViewById<Button>(R.id.btnToLogin)
+        val btnPrimary = dialogView.findViewById<Button>(R.id.btnPrimary)
+        val btnSecondary = dialogView.findViewById<Button>(R.id.btnSecondary)
 
-        btnAction.backgroundTintList = null
-        btnAction.background = ContextCompat.getDrawable(context, buttonBackgroundRes)
-
-        val drawable = ContextCompat.getDrawable(context, iconRes)
-        icon.setImageDrawable(drawable)
-
-        iconColor?.let {
-            drawable?.setTint(it)
-        }
-
+        icon.setImageDrawable(ContextCompat.getDrawable(context, iconRes)?.apply {
+            iconColor?.let { setTint(it) }
+        })
         tvTitle.text = title
         tvMessage.text = message
-        btnAction.text = buttonText
 
-        btnAction.setOnClickListener {
-            dialog.dismiss()
-            onClick?.invoke()
+        // Primary button setup
+        if (!primaryButtonText.isNullOrEmpty()) {
+            btnPrimary.text = primaryButtonText
+            primaryButtonBackgroundRes?.let {
+                btnPrimary.backgroundTintList = null
+                btnPrimary.background = ContextCompat.getDrawable(context, it)
+            }
+            btnPrimary.setOnClickListener {
+                dialog.dismiss()
+                onPrimaryClick?.invoke()
+            }
+        } else {
+            btnPrimary.text = "OK"
+            btnPrimary.setOnClickListener { dialog.dismiss() }
+        }
+
+        // Secondary button setup
+        if (!secondaryButtonText.isNullOrEmpty()) {
+            btnSecondary.visibility = View.VISIBLE
+            btnSecondary.text = secondaryButtonText
+            secondaryButtonBackgroundRes?.let {
+                btnSecondary.backgroundTintList = null
+                btnSecondary.background = ContextCompat.getDrawable(context, it)
+            }
+            btnSecondary.setOnClickListener {
+                dialog.dismiss()
+                onSecondaryClick?.invoke()
+            }
+        } else {
+            btnSecondary.visibility = View.GONE
         }
 
         dialog.show()

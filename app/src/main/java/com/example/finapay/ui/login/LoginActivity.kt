@@ -212,8 +212,8 @@ class LoginActivity : AppCompatActivity(){
                     iconRes = R.drawable.ic_baseline_360_24,
                     title = "Login Gagal!",
                     message = errorMessage,
-                    buttonText = "OK",
-                    buttonBackgroundRes = R.drawable.color_button_red,
+                    primaryButtonText = "OK",
+                    primaryButtonBackgroundRes = R.drawable.color_button_red,
                     iconColor = R.color.red
                 )
             }

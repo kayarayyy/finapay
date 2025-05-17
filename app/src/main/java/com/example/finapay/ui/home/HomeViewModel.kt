@@ -13,8 +13,8 @@ class HomeViewModel : ViewModel() {
     private val repository = CustomerDetailsRepository()
     private val _customerDetailsSuccess = MutableLiveData<CustomerDetailModel>()
     val customerDetailsSuccess: LiveData<CustomerDetailModel> = _customerDetailsSuccess
-    private val _customerDetailsError = MutableLiveData<String>()
-    val customerDetailsError: LiveData<String> = _customerDetailsError
+    private val _customerDetailsError = MutableLiveData<ApiResponse<String>>()
+    val customerDetailsError: LiveData<ApiResponse<String>> = _customerDetailsError
 
     fun getCustomerDetails() {
         repository.getCustomerDetailByEmail().enqueue(object :
@@ -27,16 +27,28 @@ class HomeViewModel : ViewModel() {
                     if (response.isSuccessful) {
                         val customerDetailsResponse = response.body()?.data
                         if (customerDetailsResponse != null) {
-                            _customerDetailsSuccess.postValue(customerDetailsResponse)
+                            _customerDetailsSuccess.postValue(customerDetailsResponse!!)
                         } else {
-                            _customerDetailsError.postValue("Data tidak ditemukan.")
+                            ApiResponse("failed", response.message().toString(), "", response.code())?.let {
+                                _customerDetailsError.postValue(
+                                    it
+                                )
+                            }
                         }
                     } else {
-                        _customerDetailsError.postValue("Terjadi kesalahan pada server.")
+                        ApiResponse("failed", response.message().toString(), "", response.code())?.let {
+                            _customerDetailsError.postValue(
+                                it
+                            )
+                        }
                     }
                 }
                 override fun onFailure(call: Call<ApiResponse<CustomerDetailModel>>, t: Throwable) {
-                        _customerDetailsError.postValue(t.localizedMessage ?: "Gagal terhubung ke server.")
+                    ApiResponse("failed", "Gagal terhubung ke server", "", 408)?.let {
+                        _customerDetailsError.postValue(
+                            it
+                        )
+                    }
                 }
             }
         )

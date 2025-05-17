@@ -12,6 +12,8 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
@@ -45,18 +47,12 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var locationTextView: TextView
 
     private val LOCATION_PERMISSION_CODE = 1001
-    private val REQUEST_IMAGE_PICK = 2002
 
     private var currentLat: Double? = null
     private var currentLon: Double? = null
 
-    private val CAMERA_PERMISSION_CODE = 1002
+    private var isEditing = false
 
-    private lateinit var ktpPreview: ImageView
-    private lateinit var ktpPreviewCard: CardView
-
-    private lateinit var selfiePreview: ImageView
-    private lateinit var selfiePreviewCard: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,14 +86,38 @@ class RequestActivity : AppCompatActivity() {
 
         checkLocationPermissionAndFetch()
 
+        amountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isEditing) return
+                isEditing = true
+                val input = s.toString().replace(".", "").replace("Rp", "").replace(" ", "")
+                if (input.isNotEmpty()) {
+                    val formatted = formatToCurrency(input)
+                    amountInput.setText(formatted)
+                    amountInput.setSelection(formatted.length)
+                }
+                isEditing = false
+            }
+        })
+
         findViewById<Button>(R.id.submit_button).setOnClickListener {
 
         }
-        
+
         observeViewModel()
     }
 
-
+    private fun formatToCurrency(value: String): String {
+        return try {
+            val parsed = value.toLong()
+            String.format("%,d", parsed).replace(",", ".")
+        } catch (e: NumberFormatException) {
+            ""
+        }
+    }
 
     private fun observeViewModel() {
         viewModel.uploadResult.observe(this) { response ->
@@ -112,8 +132,6 @@ class RequestActivity : AppCompatActivity() {
             // TODO: tampilkan/hilangkan loading indicator
         }
     }
-
-
 
     private fun checkLocationPermissionAndFetch() {
         if (ActivityCompat.checkSelfPermission(
@@ -159,14 +177,6 @@ class RequestActivity : AppCompatActivity() {
                     Toast.makeText(this, "Izin lokasi ditolak", Toast.LENGTH_SHORT).show()
                 }
             }
-
-//            CAMERA_PERMISSION_CODE -> {
-//                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    launchCamera()
-//                } else {
-//                    Toast.makeText(this, "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
-//                }
-//            }
         }
     }
 

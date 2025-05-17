@@ -27,8 +27,10 @@ import com.example.finapay.data.models.LoanModel
 import com.example.finapay.data.models.PaymentModel
 import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
+import com.example.finapay.ui.my_account.MyAccountActivity
 import com.example.finapay.ui.request.RequestActivity
 import com.example.finapay.ui.simulation.SimulationActivity
+import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.SharedPreferencesHelper
 import com.facebook.shimmer.ShimmerFrameLayout
 
@@ -38,6 +40,8 @@ class HomeFragment() : Fragment() {
     private lateinit var adapterActiveLoan: ActiveLoanAdapter
     private lateinit var adapterPayment: PaymentAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+
+    private var canRequest: Boolean? = false
 
 
     override fun onCreateView(
@@ -49,7 +53,8 @@ class HomeFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            val controller = WindowCompat.getInsetsController(requireActivity().window, requireView())
+            val controller =
+                WindowCompat.getInsetsController(requireActivity().window, requireView())
             controller?.show(WindowInsetsCompat.Type.statusBars())
         }
 
@@ -82,15 +87,34 @@ class HomeFragment() : Fragment() {
             startActivity(intent)
         }
         ivRequest.setOnClickListener {
-            val intent = Intent(requireContext(), RequestActivity::class.java)
-            startActivity(intent)
+            if (canRequest == true) {
+                val intent = Intent(requireContext(), RequestActivity::class.java)
+                startActivity(intent)
+            } else {
+                CustomDialog.show(
+                    context = this@HomeFragment.requireContext(),
+                    iconRes = R.drawable.ic_baseline_360_24,
+                    title = "Data Belum Lengkap!",
+                    message = "Lengkapi data anda untuk mengajukan pinjaman",
+                    primaryButtonText = "Lengkapi Data",
+                    primaryButtonBackgroundRes = R.drawable.color_button_blue,
+                    secondaryButtonText = "Batal",
+                    secondaryButtonBackgroundRes = R.drawable.color_button_gray,
+                    iconColor = R.color.red,
+                    onPrimaryClick = { goToMyAccount() }
+                )
+            }
         }
 
 //        Layout Manager
-        val lmActiveLoan = LinearLayoutManager(this@HomeFragment.requireContext(),
-            LinearLayoutManager.HORIZONTAL, false)
-        val lmNextPayment = LinearLayoutManager(this@HomeFragment.requireContext(),
-            LinearLayoutManager.HORIZONTAL, false)
+        val lmActiveLoan = LinearLayoutManager(
+            this@HomeFragment.requireContext(),
+            LinearLayoutManager.HORIZONTAL, false
+        )
+        val lmNextPayment = LinearLayoutManager(
+            this@HomeFragment.requireContext(),
+            LinearLayoutManager.HORIZONTAL, false
+        )
 
 //        Snap Helper
         val shActiveLoan = PagerSnapHelper()
@@ -195,6 +219,8 @@ class HomeFragment() : Fragment() {
             // TODO: Update UI dengan customer
         }
 
+
+
         viewModel.customerDetailsError.observe(viewLifecycleOwner) { error ->
             swipeRefreshLayout.isRefreshing = false
 
@@ -220,11 +246,15 @@ class HomeFragment() : Fragment() {
             shimmerName.visibility = View.GONE
             val user = sharedPreferencesHelper.getUserData()
             tvUserName.setText(user?.name ?: "-")
-            // TODO: Tampilkan pesan error, misal pakai Toast
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            canRequest = false
         }
 
         viewModel.getCustomerDetails()
+    }
+
+    private fun goToMyAccount() {
+        val intent = Intent(requireContext(), MyAccountActivity::class.java)
+        startActivity(intent)
     }
 }
 
