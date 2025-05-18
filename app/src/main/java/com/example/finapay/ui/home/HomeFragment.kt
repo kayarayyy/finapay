@@ -216,6 +216,7 @@ class HomeFragment() : Fragment() {
             shimmerName.stopShimmer()
             shimmerName.visibility = View.GONE
             tvUserName.setText(customer.user?.name)
+            canRequest = true
             // TODO: Update UI dengan customer
         }
 

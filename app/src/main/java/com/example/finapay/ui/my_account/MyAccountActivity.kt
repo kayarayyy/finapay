@@ -7,8 +7,8 @@ import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Typeface
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,24 +28,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.finapay.ui.home.HomeViewModel
 import com.example.finapay.R
+import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.utils.CustomDialog
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
+import com.google.android.material.textfield.TextInputLayout
+import com.example.finapay.utils.FormUtils
 import java.util.Calendar
 
 class MyAccountActivity : AppCompatActivity() {
 
     // ViewModel
     private val viewModel: MyAccountViewModel by viewModels()
+
+    // Utils
+    private lateinit var formUtils: FormUtils
 
     // Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -69,8 +69,24 @@ class MyAccountActivity : AppCompatActivity() {
     private lateinit var provinceInput: TextInputEditText
     private lateinit var postalCodeInput: TextInputEditText
 
+    //    Views: InputLayout
+    private lateinit var nikInputLayout: TextInputLayout
+    private lateinit var ttlInputLayout: TextInputLayout
+    private lateinit var phoneInputLayout: TextInputLayout
+    private lateinit var mothersNameInputLayout: TextInputLayout
+    private lateinit var jobInputLayout: TextInputLayout
+    private lateinit var salaryInputLayout: TextInputLayout
+    private lateinit var accountInputLayout: TextInputLayout
+    private lateinit var houseStatusInputLayout: TextInputLayout
+    private lateinit var streetInputLayout: TextInputLayout
+    private lateinit var districtInputLayout: TextInputLayout
+    private lateinit var provinceInputLayout: TextInputLayout
+    private lateinit var postalCodeInputLayout: TextInputLayout
+
     // Views: Radio Group
     private lateinit var genderRadioGroup: RadioGroup
+    private lateinit var genderMaleRadioButton: RadioButton
+    private lateinit var genderFemaleRadioButton: RadioButton
 
     // Views: Button
     private lateinit var refreshLocationButton: MaterialButton
@@ -79,7 +95,7 @@ class MyAccountActivity : AppCompatActivity() {
     private lateinit var uploadHouseButton: MaterialButton
     private lateinit var submitButton: MaterialButton
 
-//    Views : Progress Bar
+    //    Views : Progress Bar
     private lateinit var progressBar: View
 
     // Views: ImageView & CardView
@@ -178,58 +194,31 @@ class MyAccountActivity : AppCompatActivity() {
     }
 
     private fun submitData() {
-        val nik = nikInput.text.toString()
-        val selectedGenderId = genderRadioGroup.checkedRadioButtonId
-        val gender = when (selectedGenderId) {
-            R.id.gender_male -> "LAKI_LAKI"
-            R.id.gender_female -> "PEREMPUAN"
-            else -> "Belum dipilih"
-        }
-        val ttl = ttlInput.text.toString()
-        val phone = phoneInput.text.toString()
-        val mothersName = mothersNameInput.text.toString()
-        val job = jobInput.text.toString()
-        val salary = salaryInput.text.toString()
-        val account = accountInput.text.toString()
-        val houseStatus = houseStatusInput.text.toString()
-        val street = streetInput.text.toString()
-        val district = districtInput.text.toString()
-        val province = provinceInput.text.toString()
-        val zipCode = postalCodeInput.text.toString()
-        val ktp = ktpUri
-        val selfie = selfieUri
-        val house = houseUri
-
-        // Konversi ke RequestBody
-        fun String.toRequestBody() = toRequestBody("text/plain".toMediaTypeOrNull())
-
-        // Contoh latitude dan longitude (harus diganti dengan nilai dari GPS-mu)
-        val latitude = (currentLat ?: 0.0).toString()
-        val longitude = (currentLon ?: 0.0).toString()
-
-        // Konversi file URI ke Multipart
-        fun uriToMultipart(name: String, uri: Uri?): MultipartBody.Part? {
-            uri ?: return null
-            val inputStream = contentResolver.openInputStream(uri) ?: return null
-            val fileBytes = inputStream.readBytes()
-            val requestFile = fileBytes.toRequestBody("image/*".toMediaTypeOrNull())
-            return MultipartBody.Part.createFormData(name, "image.jpg", requestFile)
-        }
-
-        if (currentLat == null || currentLon == null) {
-            Toast.makeText(this, "Silakan perbarui lokasi terlebih dahulu", Toast.LENGTH_SHORT)
-                .show()
-
-        }
-
-        val ktpPart = uriToMultipart("ktp", ktp)
-        val selfiePart = uriToMultipart("selfieKtp", selfie)
-        val housePart = uriToMultipart("house", house)
-
-        if (ktpPart == null || selfiePart == null || housePart == null) {
-            Toast.makeText(this, "Semua gambar harus diisi", Toast.LENGTH_SHORT).show()
-
-        }
+        if (!validateForm()) return
+        val customerDetail = CustomerDetailModel(
+            nik = nikInput.text.toString().trim(),
+            gender = when (genderRadioGroup.checkedRadioButtonId) {
+                R.id.gender_male -> "LAKI_LAKI"
+                R.id.gender_female -> "PEREMPUAN"
+                else -> null
+            },
+            ttl = ttlInput.text.toString().trim(),
+            phone = phoneInput.text.toString().trim(),
+            mothersName = mothersNameInput.text.toString().trim(),
+            job = jobInput.text.toString().trim(),
+            salary = salaryInput.text.toString().trim(),
+            account = accountInput.text.toString().trim(),
+            houseStatus = houseStatusInput.text.toString().trim(),
+            street = streetInput.text.toString().trim(),
+            district = districtInput.text.toString().trim(),
+            province = provinceInput.text.toString().trim(),
+            postalCode = postalCodeInput.text.toString().trim(),
+            latitude = currentLat,
+            longitude = currentLon,
+            selfie = selfieUri?.toString(),
+            ktp = ktpUri?.toString(),
+            house = houseUri?.toString()
+        )
 
         CustomDialog.show(
             context = this,
@@ -242,24 +231,11 @@ class MyAccountActivity : AppCompatActivity() {
             secondaryButtonBackgroundRes = R.drawable.color_button_gray,
             onPrimaryClick = {
                 viewModel.submitCustomerDetails(
-                    street.toRequestBody(),
-                    district.toRequestBody(),
-                    province.toRequestBody(),
-                    zipCode.toRequestBody(),
-                    latitude.toRequestBody(),
-                    longitude.toRequestBody(),
-                    gender.toRequestBody(),
-                    ttl.toRequestBody(),
-                    phone.toRequestBody(),
-                    nik.toRequestBody(),
-                    mothersName.toRequestBody(),
-                    job.toRequestBody(),
-                    salary.toRequestBody(),
-                    account.toRequestBody(),
-                    houseStatus.toRequestBody(),
-                    selfiePart!!,
-                    housePart!!,
-                    ktpPart!!
+                    customerDetail,
+                    this,
+                    selfieUri,
+                    ktpUri,
+                    houseUri
                 )
             },
             iconColor = R.color.blue,
@@ -267,7 +243,84 @@ class MyAccountActivity : AppCompatActivity() {
     }
 
 
+    private fun validateForm(): Boolean {
+        window.decorView.clearFocus()
+
+        var isValid = true
+        var firstInvalidView: View? = null
+
+        fun validateEditText(layout: TextInputLayout, input: TextInputEditText, fieldName: String) {
+            if (input.text.isNullOrBlank()) {
+                layout.error = "$fieldName wajib diisi"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else {
+                layout.error = null
+            }
+        }
+
+        validateEditText(nikInputLayout, nikInput, "NIK")
+        validateEditText(ttlInputLayout, ttlInput, "Tanggal lahir")
+        validateEditText(phoneInputLayout, phoneInput, "Nomor telepon")
+        validateEditText(mothersNameInputLayout, mothersNameInput, "Nama ibu kandung")
+        validateEditText(jobInputLayout, jobInput, "Pekerjaan")
+        validateEditText(salaryInputLayout, salaryInput, "Gaji")
+        validateEditText(accountInputLayout, accountInput, "Nomor rekening")
+        validateEditText(houseStatusInputLayout, houseStatusInput, "Status rumah")
+        validateEditText(streetInputLayout, streetInput, "Alamat jalan")
+        validateEditText(districtInputLayout, districtInput, "Kecamatan")
+        validateEditText(provinceInputLayout, provinceInput, "Provinsi")
+        validateEditText(postalCodeInputLayout, postalCodeInput, "Kode pos")
+
+        // Gender
+        if (genderRadioGroup.checkedRadioButtonId == -1) {
+            isValid = false
+            val redColor = ContextCompat.getColorStateList(this, R.color.error_red)
+            genderMaleRadioButton.buttonTintList = redColor
+            genderFemaleRadioButton.buttonTintList = redColor
+            if (firstInvalidView == null) firstInvalidView = genderRadioGroup
+        }
+
+        // Lokasi
+        if (currentLat == null || currentLon == null) {
+            locationErrorTextView.visibility = View.VISIBLE
+            locationErrorTextView.text = "Lokasi belum dipilih"
+            isValid = false
+            if (firstInvalidView == null) firstInvalidView = refreshLocationButton
+        } else {
+            locationErrorTextView.visibility = View.GONE
+        }
+
+        // Gambar
+        if (ktpUri == null) {
+            isValid = false
+            formUtils.setErrorBorder(uploadKtpButton, true, this)
+            if (firstInvalidView == null) firstInvalidView = uploadKtpButton
+        }
+
+        if (selfieUri == null) {
+            isValid = false
+            formUtils.setErrorBorder(uploadSelfieButton, true, this)
+            if (firstInvalidView == null) firstInvalidView = uploadSelfieButton
+        }
+
+        if (houseUri == null) {
+            isValid = false
+            formUtils.setErrorBorder(uploadHouseButton, true, this)
+            if (firstInvalidView == null) firstInvalidView = uploadHouseButton
+        }
+
+        // Fokuskan ke field pertama yang invalid
+        firstInvalidView?.requestFocus()
+
+        return isValid
+    }
+
+
     private fun initViews() {
+        formUtils = FormUtils()
         progressBar = findViewById(R.id.loading_indicator)
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
@@ -283,19 +336,84 @@ class MyAccountActivity : AppCompatActivity() {
         districtInput = findViewById(R.id.district_input)
         provinceInput = findViewById(R.id.province_input)
         postalCodeInput = findViewById(R.id.postal_code_input)
+        nikInputLayout = findViewById(R.id.nik_layout)
+        ttlInputLayout = findViewById(R.id.ttl_layout)
+        phoneInputLayout = findViewById(R.id.phone_layout)
+        mothersNameInputLayout = findViewById(R.id.mothers_name_layout)
+        jobInputLayout = findViewById(R.id.job_layout)
+        salaryInputLayout = findViewById(R.id.salary_layout)
+        accountInputLayout = findViewById(R.id.account_layout)
+        houseStatusInputLayout = findViewById(R.id.house_status_layout)
+        streetInputLayout = findViewById(R.id.street_layout)
+        districtInputLayout = findViewById(R.id.district_layout)
+        provinceInputLayout = findViewById(R.id.province_layout)
+        postalCodeInputLayout = findViewById(R.id.postal_code_layout)
         refreshLocationButton = findViewById(R.id.refresh_location_button)
         uploadKtpButton = findViewById(R.id.upload_ktp_button)
         uploadSelfieButton = findViewById(R.id.upload_selfie_ktp_button)
         uploadHouseButton = findViewById(R.id.upload_house_button)
         submitButton = findViewById(R.id.submit_button)
         genderRadioGroup = findViewById(R.id.gender_group)
+        genderMaleRadioButton = findViewById(R.id.gender_male)
+        genderFemaleRadioButton = findViewById(R.id.gender_female)
         ktpPreview = findViewById(R.id.ktp_preview)
         ktpPreviewCard = findViewById(R.id.ktp_preview_card)
         selfiePreview = findViewById(R.id.selfie_ktp_preview)
         selfiePreviewCard = findViewById(R.id.selfie_ktp_preview_card)
         housePreview = findViewById(R.id.house_preview)
         housePreviewCard = findViewById(R.id.house_preview_card)
+
+        formUtils.clearErrorOnInput(nikInputLayout, nikInput)
+        formUtils.clearErrorOnInput(ttlInputLayout, ttlInput)
+        formUtils.clearErrorOnInput(phoneInputLayout, phoneInput)
+        formUtils.clearErrorOnInput(mothersNameInputLayout, mothersNameInput)
+        formUtils.clearErrorOnInput(jobInputLayout, jobInput)
+        formUtils.clearErrorOnInput(salaryInputLayout, salaryInput)
+        formUtils.clearErrorOnInput(accountInputLayout, accountInput)
+        formUtils.clearErrorOnInput(houseStatusInputLayout, houseStatusInput)
+        formUtils.clearErrorOnInput(streetInputLayout, streetInput)
+        formUtils.clearErrorOnInput(districtInputLayout, districtInput)
+        formUtils.clearErrorOnInput(provinceInputLayout, provinceInput)
+        formUtils.clearErrorOnInput(postalCodeInputLayout, postalCodeInput)
+        genderRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            val blueColor = ContextCompat.getColorStateList(this, R.color.blue)
+            val grayColor = ContextCompat.getColorStateList(this, R.color.gray)
+
+            when (checkedId) {
+                R.id.gender_male -> {
+                    genderMaleRadioButton.buttonTintList = blueColor
+                    genderFemaleRadioButton.buttonTintList = grayColor
+                }
+
+                R.id.gender_female -> {
+                    genderMaleRadioButton.buttonTintList = grayColor
+                    genderFemaleRadioButton.buttonTintList = blueColor
+                }
+            }
+        }
     }
+
+//
+//    fun formUtils.setErrorBorder(button: MaterialButton, isError: Boolean) {
+//        val color = if (isError) R.color.error_red else R.color.blue_primary
+//        val strokeWidth = if (isError) 4 else 2
+//        button.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, color))
+//        button.strokeWidth = strokeWidth
+//    }
+//
+//    fun clearErrorOnInput(layout: TextInputLayout, input: TextInputEditText) {
+//        input.addTextChangedListener(object : TextWatcher {
+//            override fun afterTextChanged(s: Editable?) {
+//                if (!s.isNullOrBlank()) {
+//                    layout.error = null
+//                }
+//            }
+//
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//        })
+//    }
+
 
     private fun formatToCurrency(value: String): String {
         return try {
@@ -464,18 +582,21 @@ class MyAccountActivity : AppCompatActivity() {
     private fun displayImage(uri: Uri) {
         when (selectedImageType) {
             ImageType.KTP -> {
+                formUtils.setErrorBorder(uploadKtpButton, false, this)
                 ktpUri = uri
                 ktpPreview.setImageURI(uri)
                 ktpPreviewCard.visibility = View.VISIBLE
             }
 
             ImageType.SELFIE -> {
+                formUtils.setErrorBorder(uploadSelfieButton, false, this)
                 selfieUri = uri
                 selfiePreview.setImageURI(uri)
                 selfiePreviewCard.visibility = View.VISIBLE
             }
 
             ImageType.HOUSE -> {
+                formUtils.setErrorBorder(uploadHouseButton, false, this)
                 houseUri = uri
                 housePreview.setImageURI(uri)
                 housePreviewCard.visibility = View.VISIBLE
