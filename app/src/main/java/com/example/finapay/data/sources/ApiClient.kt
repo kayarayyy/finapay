@@ -5,6 +5,7 @@ import com.example.finapay.data.sources.remote.CustomerDetailsService
 import com.example.finapay.data.sources.remote.LoanService
 import com.example.finapay.data.sources.remote.PlafondService
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
 //    private const val BASE_URL = "http://localhost:8080/api/v1/"
     private const val BASE_URL = "http://34.60.203.63/api/v1/"
-//    private const val BASE_URL = "https://e576-180-252-116-15.ngrok-free.app/api/v1/"
+//    private const val BASE_URL = "https://cef4-114-10-73-50.ngrok-free.app/api/v1/"
 
     private var tokenProvider: (() -> String?)? = null
 
@@ -25,8 +26,9 @@ object ApiClient {
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
-            .addInterceptor(AuthInterceptor { tokenProvider?.invoke() })
+            .addInterceptor(AuthInterceptor { tokenProvider?.invoke() }) // Auth header
             .build()
+
 
     private val retrofit: Retrofit
         get() = Retrofit.Builder()

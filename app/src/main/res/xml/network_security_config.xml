@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-<!--        <domain includeSubdomains="true">e576-180-252-116-15.ngrok-free.app</domain>-->
+<!--        <domain includeSubdomains="true">cef4-114-10-73-50.ngrok-free.app</domain>-->
         <domain includeSubdomains="true">34.60.203.63</domain>
     </domain-config>
 </network-security-config>

@@ -30,6 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.finapay.R
 import com.example.finapay.data.models.CustomerDetailModel
+import com.example.finapay.ui.home.HomeViewModel
 import com.example.finapay.utils.CustomDialog
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -37,12 +38,16 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.example.finapay.utils.FormUtils
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class MyAccountActivity : AppCompatActivity() {
+    private var submitButtonIsEnabled: Boolean = true
 
     // ViewModel
     private val viewModel: MyAccountViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     // Utils
     private lateinit var formUtils: FormUtils
@@ -54,6 +59,10 @@ class MyAccountActivity : AppCompatActivity() {
     // Views: TextView
     private lateinit var locationTextView: TextView
     private lateinit var locationErrorTextView: TextView
+    private lateinit var headerTitleTextView: TextView
+    private lateinit var headerDescriptionTextView: TextView
+    private lateinit var locationLabelTextView: TextView
+    private lateinit var locationDescriptionTextView: TextView
 
     // Views: EditText
     private lateinit var nikInput: TextInputEditText
@@ -129,48 +138,11 @@ class MyAccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_account)
 
-        initViews()
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        refreshLocationButton.setOnClickListener { checkLocationPermissionAndFetch() }
-        uploadKtpButton.setOnClickListener {
-            selectedImageType = ImageType.KTP
-            showImagePickerDialog()
-        }
-
-        uploadSelfieButton.setOnClickListener {
-            selectedImageType = ImageType.SELFIE
-            showImagePickerDialog()
-        }
-        uploadHouseButton.setOnClickListener {
-            selectedImageType = ImageType.HOUSE
-            showImagePickerDialog()
-        }
-        ttlInput.setOnClickListener { showDatePickerDialog() }
-
-        salaryInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                if (isEditing) return
-                isEditing = true
-                val input = s.toString().replace(".", "").replace("Rp", "").replace(" ", "")
-                if (input.isNotEmpty()) {
-                    val formatted = formatToCurrency(input)
-                    salaryInput.setText(formatted)
-                    salaryInput.setSelection(formatted.length)
-                }
-                isEditing = false
-            }
-        })
-
-        submitButton.setOnClickListener {
-            submitData()
-        }
-
         observeViewModel()
-
+        initViews()
+        initClickListener()
+        homeViewModel.getCustomerDetails()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     private fun observeViewModel() {
@@ -180,21 +152,48 @@ class MyAccountActivity : AppCompatActivity() {
         viewModel.isLoading.observe(this) { isLoading ->
             // TODO: tampilkan/hilangkan loading indicator
             if (isLoading) {
+                disableView()
                 progressBar.visibility = View.VISIBLE
                 submitButton.text = ""
             } else {
+                enableView()
                 progressBar.visibility = View.GONE
                 submitButton.text = "Submit"
             }
         }
         viewModel.customerDetails.observe(this) { customerDetails ->
+            CustomDialog.show(
+                context = this,
+                iconRes = R.drawable.ic_baseline_add_task_24,
+                title = "Sukses!",
+                message = "Data anda akan di review",
+                primaryButtonText = "OK",
+                primaryButtonBackgroundRes = R.drawable.color_button_blue,
+                iconColor = R.color.blue
+            )
+            disableView()
             // TODO: tampilkan data pelanggan
             Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+        }
+
+        homeViewModel.customerDetailsSuccess.observe(this) { customerDetails ->
+            customerDetails?.let {
+                fetchCustomerDetails(it)
+            }
+            disableView()
+        }
+        homeViewModel.customerDetailsError.observe(this) {
+            enableView()
         }
     }
 
     private fun submitData() {
         if (!validateForm()) return
+        val salaryCleaned = salaryInput.text.toString()
+            .replace(".", "")
+            .replace(",", ".")
+            .replace("Rp", "")
+            .replace(" ", "")
         val customerDetail = CustomerDetailModel(
             nik = nikInput.text.toString().trim(),
             gender = when (genderRadioGroup.checkedRadioButtonId) {
@@ -206,7 +205,7 @@ class MyAccountActivity : AppCompatActivity() {
             phone = phoneInput.text.toString().trim(),
             mothersName = mothersNameInput.text.toString().trim(),
             job = jobInput.text.toString().trim(),
-            salary = salaryInput.text.toString().trim(),
+            salary = salaryCleaned,
             account = accountInput.text.toString().trim(),
             houseStatus = houseStatusInput.text.toString().trim(),
             street = streetInput.text.toString().trim(),
@@ -222,8 +221,8 @@ class MyAccountActivity : AppCompatActivity() {
 
         CustomDialog.show(
             context = this,
-            iconRes = R.drawable.ic_outline_image_24,
-            title = "Submit",
+            iconRes = R.drawable.ic_baseline_assignment_add_24,
+            title = "Submit Data?",
             message = "Pastikan data anda sudah terisi dengan benar",
             primaryButtonText = "Ya",
             primaryButtonBackgroundRes = R.drawable.color_button_blue,
@@ -241,7 +240,6 @@ class MyAccountActivity : AppCompatActivity() {
             iconColor = R.color.blue,
         )
     }
-
 
     private fun validateForm(): Boolean {
         window.decorView.clearFocus()
@@ -318,12 +316,15 @@ class MyAccountActivity : AppCompatActivity() {
         return isValid
     }
 
-
     private fun initViews() {
         formUtils = FormUtils()
+        headerTitleTextView = findViewById(R.id.header_title)
+        headerDescriptionTextView = findViewById(R.id.header_description)
         progressBar = findViewById(R.id.loading_indicator)
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
+        locationLabelTextView = findViewById(R.id.location_label)
+        locationDescriptionTextView = findViewById(R.id.location_description)
         nikInput = findViewById(R.id.nik_input)
         ttlInput = findViewById(R.id.ttl_input)
         phoneInput = findViewById(R.id.phone_input)
@@ -375,6 +376,79 @@ class MyAccountActivity : AppCompatActivity() {
         formUtils.clearErrorOnInput(districtInputLayout, districtInput)
         formUtils.clearErrorOnInput(provinceInputLayout, provinceInput)
         formUtils.clearErrorOnInput(postalCodeInputLayout, postalCodeInput)
+    }
+
+    private fun disableView() {
+        submitButtonIsEnabled = false
+        nikInput.isEnabled = false
+        ttlInput.isEnabled = false
+        phoneInput.isEnabled = false
+        mothersNameInput.isEnabled = false
+        jobInput.isEnabled = false
+        salaryInput.isEnabled = false
+        accountInput.isEnabled = false
+        houseStatusInput.isEnabled = false
+        streetInput.isEnabled = false
+        districtInput.isEnabled = false
+        provinceInput.isEnabled = false
+        postalCodeInput.isEnabled = false
+        genderRadioGroup.isEnabled = false
+        genderMaleRadioButton.isEnabled = false
+        genderFemaleRadioButton.isEnabled = false
+        uploadKtpButton.isEnabled = false
+        uploadSelfieButton.isEnabled = false
+        uploadHouseButton.isEnabled = false
+        refreshLocationButton.isEnabled = false
+    }
+
+    private fun enableView() {
+        submitButtonIsEnabled = true
+        nikInput.isEnabled = true
+        ttlInput.isEnabled = true
+        phoneInput.isEnabled = true
+        mothersNameInput.isEnabled = true
+        jobInput.isEnabled = true
+        salaryInput.isEnabled = true
+        accountInput.isEnabled = true
+        houseStatusInput.isEnabled = true
+        streetInput.isEnabled = true
+        districtInput.isEnabled = true
+        provinceInput.isEnabled = true
+        postalCodeInput.isEnabled = true
+        genderRadioGroup.isEnabled = true
+        genderMaleRadioButton.isEnabled = true
+        genderFemaleRadioButton.isEnabled = true
+        uploadKtpButton.isEnabled = true
+        uploadSelfieButton.isEnabled = true
+        uploadHouseButton.isEnabled = true
+        refreshLocationButton.isEnabled = true
+    }
+
+    private fun fetchCustomerDetails(customer: CustomerDetailModel) {
+        headerTitleTextView.setText("Profile")
+        headerDescriptionTextView.setText("Berikut adalah data lengkap Anda")
+        locationTextView.visibility = View.GONE
+        locationErrorTextView.visibility = View.GONE
+        locationLabelTextView.visibility = View.GONE
+        locationDescriptionTextView.visibility = View.GONE
+        refreshLocationButton.visibility = View.GONE
+        submitButton.setText("Edit")
+        nikInput.setText(customer.nik)
+        ttlInput.setText(customer.formattedTtl)
+        phoneInput.setText(customer.phone)
+        mothersNameInput.setText(customer.mothersName)
+        jobInput.setText(customer.job)
+        salaryInput.setText(customer.salary)
+        accountInput.setText(customer.account)
+        houseStatusInput.setText(customer.houseStatus)
+        streetInput.setText(customer.street)
+        districtInput.setText(customer.district)
+        provinceInput.setText(customer.province)
+        postalCodeInput.setText(customer.postalCode)
+        genderRadioGroup.check(if (customer.gender == "LAKI_LAKI") R.id.gender_male else R.id.gender_female)
+    }
+
+    private fun initClickListener(){
         genderRadioGroup.setOnCheckedChangeListener { group, checkedId ->
             val blueColor = ContextCompat.getColorStateList(this, R.color.blue)
             val grayColor = ContextCompat.getColorStateList(this, R.color.gray)
@@ -391,29 +465,45 @@ class MyAccountActivity : AppCompatActivity() {
                 }
             }
         }
+        refreshLocationButton.setOnClickListener { checkLocationPermissionAndFetch() }
+        uploadKtpButton.setOnClickListener {
+            selectedImageType = ImageType.KTP
+            showImagePickerDialog()
+        }
+
+        uploadSelfieButton.setOnClickListener {
+            selectedImageType = ImageType.SELFIE
+            showImagePickerDialog()
+        }
+        uploadHouseButton.setOnClickListener {
+            selectedImageType = ImageType.HOUSE
+            showImagePickerDialog()
+        }
+        ttlInput.setOnClickListener { showDatePickerDialog() }
+
+        salaryInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isEditing) return
+                isEditing = true
+                val input = s.toString().replace(".", "").replace("Rp", "").replace(" ", "")
+                if (input.isNotEmpty()) {
+                    val formatted = formatToCurrency(input)
+                    salaryInput.setText(formatted)
+                    salaryInput.setSelection(formatted.length)
+                }
+                isEditing = false
+            }
+        })
+
+        submitButton.setOnClickListener {
+            if (submitButtonIsEnabled) {
+                submitData()
+            }
+        }
     }
-
-//
-//    fun formUtils.setErrorBorder(button: MaterialButton, isError: Boolean) {
-//        val color = if (isError) R.color.error_red else R.color.blue_primary
-//        val strokeWidth = if (isError) 4 else 2
-//        button.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, color))
-//        button.strokeWidth = strokeWidth
-//    }
-//
-//    fun clearErrorOnInput(layout: TextInputLayout, input: TextInputEditText) {
-//        input.addTextChangedListener(object : TextWatcher {
-//            override fun afterTextChanged(s: Editable?) {
-//                if (!s.isNullOrBlank()) {
-//                    layout.error = null
-//                }
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-//        })
-//    }
-
 
     private fun formatToCurrency(value: String): String {
         return try {
@@ -439,7 +529,6 @@ class MyAccountActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showPermissionSettingsDialog(permissionName: String) {
         AlertDialog.Builder(this).setTitle("Izin Diperlukan")
             .setMessage("Izin $permissionName diperlukan untuk fitur ini. Aktifkan secara manual di pengaturan aplikasi.")
@@ -450,7 +539,6 @@ class MyAccountActivity : AppCompatActivity() {
                 startActivity(intent)
             }.setNegativeButton("Batal", null).show()
     }
-
 
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     private fun getLastLocation() {
@@ -507,7 +595,6 @@ class MyAccountActivity : AppCompatActivity() {
             launchCamera()
         }
     }
-
 
     private fun launchCamera() {
         imageUri = createImageUri()
@@ -578,7 +665,6 @@ class MyAccountActivity : AppCompatActivity() {
         }
     }
 
-
     private fun displayImage(uri: Uri) {
         when (selectedImageType) {
             ImageType.KTP -> {
@@ -616,10 +702,17 @@ class MyAccountActivity : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(
             this, { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate =
-                    String.format("%02d-%02d-%04d", selectedDay, selectedMonth + 1, selectedYear)
+                // Buat objek calendar dari tanggal yang dipilih
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+
+                // Format ke: 13 Agustus 2002
+                val sdf = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
+                val formattedDate = sdf.format(selectedCalendar.time)
+
                 ttlInput.setText(formattedDate)
-            }, year, month, day
+            },
+            year, month, day
         )
 
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis()

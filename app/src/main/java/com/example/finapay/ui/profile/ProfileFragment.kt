@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.finapay.R
+import com.example.finapay.ui.home.HomeViewModel
 import com.example.finapay.ui.login.LoginActivity
 import com.example.finapay.ui.my_account.MyAccountActivity
 import com.example.finapay.utils.CustomDialog
@@ -19,6 +20,7 @@ import com.example.finapay.utils.SharedPreferencesHelper
 
 class ProfileFragment : Fragment() {
     private lateinit var viewModel: ProfileViewModel
+    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?

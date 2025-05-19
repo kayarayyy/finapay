@@ -10,6 +10,7 @@ data class CustomerDetailModel(
 	val longitude: Double? = null,
 	val gender: String? = null,
 	val ttl: String? = null,
+	val formattedTtl: String? = null,
 	val phone: String? = null,
 	val nik: String? = null,
 	val mothersName: String? = null,
