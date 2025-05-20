@@ -143,7 +143,7 @@ class MyAccountActivity : AppCompatActivity() {
 
         observeViewModel()
         initViews()
-        initClickListener()
+        setupListener()
         homeViewModel.getCustomerDetails()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
@@ -478,7 +478,7 @@ class MyAccountActivity : AppCompatActivity() {
         housePreviewCard.visibility = View.VISIBLE
     }
 
-    private fun initClickListener(){
+    private fun setupListener(){
         genderRadioGroup.setOnCheckedChangeListener { group, checkedId ->
             val blueColor = ContextCompat.getColorStateList(this, R.color.blue)
             val grayColor = ContextCompat.getColorStateList(this, R.color.gray)

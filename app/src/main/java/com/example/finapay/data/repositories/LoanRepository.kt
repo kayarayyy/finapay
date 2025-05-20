@@ -13,12 +13,12 @@ class LoanRepository {
     }
 
     fun postLoanRequest(
+        refferal: RequestBody,
         amount: RequestBody,
         tenor: RequestBody,
         latitude: RequestBody,
-        longitude: RequestBody,
-        ktpImage: MultipartBody.Part,
+        longitude: RequestBody
     ): Call<ApiResponse<LoanModel>> {
-        return ApiClient.loanService.uploadKtpImage(amount, tenor, latitude, longitude, ktpImage)
+        return ApiClient.loanService.uploadKtpImage(refferal, amount, tenor, latitude, longitude)
     }
 }

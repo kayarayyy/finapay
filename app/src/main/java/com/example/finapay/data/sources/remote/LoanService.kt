@@ -17,10 +17,10 @@ interface LoanService {
     @Multipart
     @POST("loan-requests") // Ganti sesuai endpoint-mu
     fun uploadKtpImage(
+        @Part("refferal") refferal: RequestBody,
         @Part("amount") amount: RequestBody,
         @Part("tenor") tenor: RequestBody,
         @Part("latitude") latitude: RequestBody,
-        @Part("longitude") longitude: RequestBody,
-        @Part ktpImage: MultipartBody.Part,
+        @Part("longitude") longitude: RequestBody
     ): Call<ApiResponse<LoanModel>>
 }

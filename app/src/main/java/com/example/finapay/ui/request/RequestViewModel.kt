@@ -1,17 +1,23 @@
 package com.example.finapay.ui.request
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finapay.data.models.AuthModel
 import com.example.finapay.data.models.LoanModel
 import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.LoanRepository
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,37 +35,29 @@ class RequestViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // Configuration values
-    private val minLoanAmount = 1_000_000
-    private val maxLoanAmount = 50_000_000
-    private val minTenor = 1
-    private val maxTenor = 36
-
-    fun uploadKtpWithLocation(
-        amount: RequestBody,
-        tenor: RequestBody,
-        latitude: RequestBody,
-        longitude: RequestBody,
-        imagePart: MultipartBody.Part
+    fun uploadPengajuan(
+        refferal: String?,
+        amount: String,
+        tenor: String,
+        latitude: String,
+        longitude: String
     ) {
         _isLoading.postValue(true)
 
-        // Validate inputs before making API call
-        try {
-            // Add some validation if needed here in addition to UI validation
-        } catch (e: Exception) {
-            _isLoading.postValue(false)
-            _uploadError.postValue("Data tidak valid: ${e.message}")
-            return
-        }
+        fun String.toRequestBody() = toRequestBody("text/plain".toMediaTypeOrNull())
 
-        // Use viewModelScope to handle cancelation automatically if the ViewModel is cleared
+        val amountCleaned = amount.replace(".", "")
+            .replace(",", ".")
+            .replace("Rp", "")
+            .replace(" ", "")
+        val refferalStr = refferal ?: ""
+
         viewModelScope.launch {
             try {
                 // Add artificial delay to show loading state (remove in production)
                 delay(1000)
 
-                repository.postLoanRequest(amount, tenor, latitude, longitude, imagePart)
+                repository.postLoanRequest(refferalStr.toRequestBody(), amountCleaned.toRequestBody(), tenor.toRequestBody(), latitude.toRequestBody(), longitude.toRequestBody())
                     .enqueue(object : Callback<ApiResponse<LoanModel>> {
                         override fun onResponse(
                             call: Call<ApiResponse<LoanModel>>,
@@ -86,7 +84,7 @@ class RequestViewModel : ViewModel() {
             } catch (e: Exception) {
                 _isLoading.postValue(false)
                 Log.e(TAG, "Exception during API call", e)
-                _uploadError.postValue("Terjadi kesalahan: ${e.message}")
+                _uploadError.postValue("Terjadi kesalahan: Gagal terhubung ke server")
             }
         }
     }
@@ -95,9 +93,11 @@ class RequestViewModel : ViewModel() {
      * Handle different HTTP error responses with appropriate user-friendly messages
      */
     private fun handleErrorResponse(response: Response<ApiResponse<LoanModel>>) {
-        val errorBody = response.errorBody()?.string()
+        val gson = Gson()
+        val type = object : TypeToken<ApiResponse<AuthModel>>() {}.type
+        val errorResponse: ApiResponse<AuthModel>? = gson.fromJson(response.errorBody()?.charStream(), type)
         val errorMessage = when (response.code()) {
-            400 -> "Data yang dikirim tidak valid"
+            400 -> errorResponse?.message ?: "Data yang dikirim tidak valid"
             401 -> "Sesi telah berakhir, silakan login kembali"
             403 -> "Anda tidak memiliki akses untuk fitur ini"
             404 -> "Layanan tidak ditemukan"
@@ -105,7 +105,7 @@ class RequestViewModel : ViewModel() {
             else -> "Terjadi kesalahan: ${response.code()}"
         }
 
-        Log.e(TAG, "API error: ${response.code()} - $errorBody")
+        Log.e(TAG, "API error: ${response.code()} - ${errorResponse?.message}")
         _uploadError.postValue(errorMessage)
     }
 
@@ -118,24 +118,9 @@ class RequestViewModel : ViewModel() {
                 "Koneksi timeout, periksa jaringan Anda"
             throwable.message?.contains("Unable to resolve host", ignoreCase = true) == true ->
                 "Tidak dapat terhubung ke server, periksa koneksi internet Anda"
+            throwable.message?.contains("Failed to connect", ignoreCase = true) == true ->
+                "Tidak dapat terhubung ke server, periksa koneksi internet Anda"
             else -> "Terjadi kesalahan: ${throwable.message}"
-        }
-    }
-
-    /**
-     * Validate loan request parameters
-     */
-    fun validateLoanRequest(amount: Int, tenor: Int): Pair<Boolean, String?> {
-        return when {
-            amount < minLoanAmount ->
-                Pair(false, "Minimum pinjaman Rp $minLoanAmount")
-            amount > maxLoanAmount ->
-                Pair(false, "Maksimum pinjaman Rp $maxLoanAmount")
-            tenor < minTenor ->
-                Pair(false, "Minimum tenor $minTenor bulan")
-            tenor > maxTenor ->
-                Pair(false, "Maksimum tenor $maxTenor bulan")
-            else -> Pair(true, null)
         }
     }
 
