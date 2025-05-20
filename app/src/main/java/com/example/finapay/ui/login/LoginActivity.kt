@@ -11,6 +11,7 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -29,36 +30,44 @@ import com.example.finapay.data.models.requests.FcmRegisterRequest
 import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.register.RegisterActivity
 import com.example.finapay.utils.CustomDialog
+import com.example.finapay.utils.FormUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 
-class LoginActivity : AppCompatActivity(){
+class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels()
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var formUtils: FormUtils
 
-    private fun getFCMToken(onTokenReceived: (String?) -> Unit) {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val token = task.result
-                Log.d("FCM", "FCM Token: $token")
-                onTokenReceived(token)
-            } else {
-                Log.w("FCM", "Fetching FCM token failed", task.exception)
-                onTokenReceived(null)
-            }
-        }
-    }
+    private lateinit var emailInput: TextInputEditText
+    private lateinit var passwordInput: TextInputEditText
+
+    private lateinit var emailInputLayout: TextInputLayout
+    private lateinit var passwordInputLayout: TextInputLayout
+
+    private lateinit var loginButton: Button
+    private lateinit var loginGoogleButton: SignInButton
+    private lateinit var loginProgress: ProgressBar
+
+    private lateinit var bgWave: ImageView
+    private lateinit var bgWave1: ImageView
+    private lateinit var animation: Animation
+
+    private lateinit var registerPrompt: TextView
+
+    private var registerButtonIsEnabled: Boolean = true
 
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
-        val loginButton = findViewById<Button>(R.id.btnLogin)
+//        val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
         Log.d("GoogleLogin", "res code: ${result.resultCode} & ${result.data}")
 
         if (result.resultCode == RESULT_OK && result.data != null) {
@@ -74,54 +83,42 @@ class LoginActivity : AppCompatActivity(){
                         viewModel.signInGoogle(tokenId, fcmToken ?: "", this)
                     }
                 } else {
+                    enableView()
                     loginProgress.visibility = View.GONE
-                    loginButton.text = "Login"
-                    loginButton.isEnabled = true
                     Toast.makeText(this, "Token ID tidak tersedia", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: ApiException) {
+                enableView()
                 loginProgress.visibility = View.GONE
-                loginButton.text = "Login"
-                loginButton.isEnabled = true
                 Log.e("GoogleLogin", "Login gagal, code=${e.statusCode}", e)
-                Toast.makeText(this, "Login Google gagal: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Login Google gagal: ${e.localizedMessage}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         } else {
+            enableView()
             loginProgress.visibility = View.GONE
-            loginButton.text = "Login"
-            loginButton.isEnabled = true
             Log.e("GoogleLogin", "Login dibatalkan oleh pengguna.")
         }
     }
 
-
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("Permission", "Notification permission granted")
+        } else {
+            Log.d("Permission", "Notification permission denied")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         setContentView(R.layout.activity_login)
         askNotificationPermission()
-
-
-        val emailField = findViewById<EditText>(R.id.etEmail)
-        val passwordField = findViewById<EditText>(R.id.etPassword)
-        val loginButton = findViewById<Button>(R.id.btnLogin)
-        val loginGoogleButton = findViewById<SignInButton>(R.id.btn_google_sign_in)
-        val loginProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
-        var bgWave = findViewById<ImageView>(R.id.bgWave)
-        var bgWave1 = findViewById<ImageView>(R.id.bgWave1)
-        val animation = Animation()
-        animation.animationslidebottom(bgWave)
-        animation.animationslidebottom(bgWave1, 550)
-
-        loginButton.backgroundTintList=null
-
-        val textView = findViewById<TextView>(R.id.tvRegisterPrompt)
-        val fullText = "Don't have an account? Register"
-        val spannable = SpannableString(fullText)
-
-        val start = fullText.indexOf("Register")
-        val end = start + "Register".length
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("630482567435-4ck2eqarg55ua42v9g2d2gmj5kgphfv5.apps.googleusercontent.com") // Ganti dengan Client ID milikmu
@@ -130,10 +127,124 @@ class LoginActivity : AppCompatActivity(){
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        initViews()
+        setupListener()
+        observeViewModel()
+    }
+
+    private fun initViews() {
+        formUtils = FormUtils()
+        emailInputLayout = findViewById(R.id.etEmailLayout)
+        passwordInputLayout = findViewById(R.id.etPasswordLayout)
+        emailInput = findViewById(R.id.etEmail)
+        passwordInput = findViewById(R.id.etPassword)
+        loginButton = findViewById(R.id.btnLogin)
+        loginGoogleButton = findViewById(R.id.btn_google_sign_in)
+        loginProgress = findViewById(R.id.btnProgressBar)
+        bgWave = findViewById(R.id.bgWave)
+        bgWave1 = findViewById(R.id.bgWave1)
+        registerPrompt = findViewById(R.id.tvRegisterPrompt)
+        animation = Animation()
+        animation.animationslidebottom(bgWave)
+        animation.animationslidebottom(bgWave1, 550)
+        loginButton.backgroundTintList = null
+        setRegisterPrompt()
+
+        formUtils.clearErrorOnInput(emailInputLayout, emailInput)
+        formUtils.clearErrorOnInput(passwordInputLayout, passwordInput)
+    }
+
+    private fun disableView() {
+        loginGoogleButton.isEnabled = false
+        emailInput.isEnabled = false
+        passwordInput.isEnabled = false
+        loginButton.text = ""
+        loginButton.isEnabled = false
+        registerButtonIsEnabled = false
+    }
+
+    private fun enableView(){
+        loginGoogleButton.isEnabled = true
+        emailInput.isEnabled = true
+        passwordInput.isEnabled = true
+        loginButton.text = "Login"
+        loginButton.isEnabled = true
+        registerButtonIsEnabled = true
+    }
+
+    private fun validateForm(): Boolean {
+        window.decorView.clearFocus()
+
+        var isValid = true
+        var firstInvalidView: View? = null
+
+        fun validateEditText(layout: TextInputLayout, input: TextInputEditText, fieldName: String, isEmail: Boolean = false) {
+            val text = input.text?.toString()?.trim()
+            if (text.isNullOrEmpty()) {
+                layout.error = "$fieldName wajib diisi"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else if (isEmail && !Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+                layout.error = "Format $fieldName tidak valid"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else {
+                layout.error = null
+            }
+        }
+
+        validateEditText(emailInputLayout, emailInput, "Email", isEmail = true)
+        validateEditText(passwordInputLayout, passwordInput, "Password")
+
+        firstInvalidView?.requestFocus()
+
+        return isValid
+    }
+
+    private fun setupListener() {
+        loginGoogleButton.setOnClickListener {
+            disableView()
+            loginProgress.visibility = View.VISIBLE
+
+            // Sign out terlebih dahulu untuk memastikan clean session
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            }
+        }
+
+        loginButton.setOnClickListener {
+            if (!validateForm()) return@setOnClickListener
+            disableView()
+            loginProgress.visibility = View.VISIBLE
+
+            val email = emailInput.text.toString()
+            val password = passwordInput.text.toString()
+            getFCMToken { token ->
+                if (token != null) {
+                    viewModel.login(email, password, token, this)
+                } else {
+                    viewModel.login(email, password, "", this)
+                }
+            }
+        }
+    }
+
+    private fun setRegisterPrompt() {
+        val fullText = "Don't have an account? Register"
+        val spannable = SpannableString(fullText)
+
+        val start = fullText.indexOf("Register")
+        val end = start + "Register".length
+
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
+                if (!registerButtonIsEnabled) return
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     overrideActivityTransition(
@@ -155,44 +266,15 @@ class LoginActivity : AppCompatActivity(){
 
         spannable.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        textView.text = spannable
-        textView.movementMethod = LinkMovementMethod.getInstance()
-        textView.highlightColor = Color.TRANSPARENT
+        registerPrompt.text = spannable
+        registerPrompt.movementMethod = LinkMovementMethod.getInstance()
+        registerPrompt.highlightColor = Color.TRANSPARENT
+    }
 
-
-        loginGoogleButton.setOnClickListener {
-            loginProgress.visibility = View.VISIBLE
-            loginButton.text = ""
-            loginButton.isEnabled = false
-
-            // Sign out terlebih dahulu untuk memastikan clean session
-            googleSignInClient.signOut().addOnCompleteListener {
-                val signInIntent = googleSignInClient.signInIntent
-                googleSignInLauncher.launch(signInIntent)
-            }
-        }
-
-
-        loginButton.setOnClickListener {
-            loginProgress.visibility = View.VISIBLE
-            loginButton.text = "" // Hilangkan teks "Login"
-            loginButton.isEnabled = false
-
-            val email = emailField.text.toString()
-            val password = passwordField.text.toString()
-            getFCMToken { token ->
-                if (token != null) {
-                    viewModel.login(email, password, token, this)
-                } else {
-                    viewModel.login(email, password, "", this)
-                }
-            }
-        }
-
+    private fun observeViewModel() {
         viewModel.loginSuccess.observe(this) { user ->
+            enableView()
             loginProgress.visibility = View.GONE
-            loginButton.text = "Login"
-            loginButton.isEnabled = true
 
             user?.let {
                 val intent = Intent(this, MainActivity::class.java)
@@ -202,9 +284,8 @@ class LoginActivity : AppCompatActivity(){
         }
 
         viewModel.loginError.observe(this) { errorMessage ->
+            enableView()
             loginProgress.visibility = View.GONE
-            loginButton.text = "Login"
-            loginButton.isEnabled = true
 
             errorMessage?.let {
                 CustomDialog.show(
@@ -218,22 +299,27 @@ class LoginActivity : AppCompatActivity(){
                 )
             }
         }
-
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            Log.d("Permission", "Notification permission granted")
-        } else {
-            Log.d("Permission", "Notification permission denied")
+    private fun getFCMToken(onTokenReceived: (String?) -> Unit) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                Log.d("FCM", "FCM Token: $token")
+                onTokenReceived(token)
+            } else {
+                Log.w("FCM", "Fetching FCM token failed", task.exception)
+                onTokenReceived(null)
+            }
         }
     }
 
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                )
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
