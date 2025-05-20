@@ -20,7 +20,6 @@ import com.example.finapay.utils.SharedPreferencesHelper
 
 class ProfileFragment : Fragment() {
     private lateinit var viewModel: ProfileViewModel
-    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?

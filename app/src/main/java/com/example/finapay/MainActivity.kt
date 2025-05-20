@@ -26,11 +26,26 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, HomeFragment())
-            .commit()
-
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        // Baca intent extra
+        val destination = intent.getStringExtra("destination")
+
+        when (destination) {
+            "profile" -> {
+                replaceFragment(ProfileFragment())
+                bottomNav.selectedItemId = R.id.nav_profile
+            }
+            "history" -> {
+                replaceFragment(HistoryFragment())
+                bottomNav.selectedItemId = R.id.nav_history
+            }
+            else -> {
+                replaceFragment(HomeFragment())
+                bottomNav.selectedItemId = R.id.nav_home
+            }
+        }
+
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> {
@@ -49,6 +64,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()

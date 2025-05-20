@@ -1,6 +1,8 @@
 package com.example.finapay.ui.my_account
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -18,6 +20,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
 
 class MyAccountViewModel : ViewModel() {
     private val repository = CustomerDetailsRepository()
@@ -46,13 +49,27 @@ class MyAccountViewModel : ViewModel() {
             uri ?: return null
             return try {
                 val inputStream = context.contentResolver.openInputStream(uri)
-                val fileBytes = inputStream?.readBytes() ?: return null
-                val requestFile = fileBytes.toRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData(name, "image.jpg", requestFile)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+
+                // Kompresi bitmap ke JPEG dalam memory
+                val stream = ByteArrayOutputStream()
+                var quality = 90
+                var byteArray: ByteArray
+
+                do {
+                    stream.reset()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+                    byteArray = stream.toByteArray()
+                    quality -= 10
+                } while (byteArray.size > 5_000_000 && quality > 10) // Kompres sampai di bawah 5MB atau quality 10
+
+                val requestFile = byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData(name, "$name.jpg", requestFile)
             } catch (e: Exception) {
                 null
             }
         }
+
 
         val latitude = customerDetail.latitude?.toString() ?: ""
         val longitude = customerDetail.longitude?.toString() ?: ""

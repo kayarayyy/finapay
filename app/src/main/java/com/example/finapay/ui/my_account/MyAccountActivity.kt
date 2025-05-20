@@ -28,9 +28,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.example.finapay.MainActivity
 import com.example.finapay.R
 import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.ui.home.HomeViewModel
+import com.example.finapay.ui.profile.ProfileFragment
 import com.example.finapay.utils.CustomDialog
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -169,6 +172,12 @@ class MyAccountActivity : AppCompatActivity() {
                 message = "Data anda akan di review",
                 primaryButtonText = "OK",
                 primaryButtonBackgroundRes = R.drawable.color_button_blue,
+                onPrimaryClick = {
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("destination", "profile")
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                },
                 iconColor = R.color.blue
             )
             disableView()
@@ -432,6 +441,9 @@ class MyAccountActivity : AppCompatActivity() {
         locationLabelTextView.visibility = View.GONE
         locationDescriptionTextView.visibility = View.GONE
         refreshLocationButton.visibility = View.GONE
+        uploadKtpButton.visibility = View.GONE
+        uploadSelfieButton.visibility = View.GONE
+        uploadHouseButton.visibility = View.GONE
         submitButton.setText("Edit")
         nikInput.setText(customer.nik)
         ttlInput.setText(customer.formattedTtl)
@@ -446,6 +458,24 @@ class MyAccountActivity : AppCompatActivity() {
         provinceInput.setText(customer.province)
         postalCodeInput.setText(customer.postalCode)
         genderRadioGroup.check(if (customer.gender == "LAKI_LAKI") R.id.gender_male else R.id.gender_female)
+        Glide.with(this)
+            .load(customer.ktpUrl)
+            .placeholder(R.drawable.placeholder_image)
+            .error(R.drawable.error_placeholder)
+            .into(ktpPreview)
+        Glide.with(this)
+            .load(customer.selfieKtpUrl)
+            .placeholder(R.drawable.placeholder_image)
+            .error(R.drawable.error_placeholder)
+            .into(selfiePreview)
+        Glide.with(this)
+            .load(customer.houseUrl)
+            .placeholder(R.drawable.placeholder_image)
+            .error(R.drawable.error_placeholder)
+            .into(housePreview)
+        ktpPreviewCard.visibility = View.VISIBLE
+        selfiePreviewCard.visibility = View.VISIBLE
+        housePreviewCard.visibility = View.VISIBLE
     }
 
     private fun initClickListener(){
