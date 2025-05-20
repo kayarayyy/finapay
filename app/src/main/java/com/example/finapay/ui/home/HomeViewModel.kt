@@ -8,6 +8,7 @@ import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.CustomerDetailsRepository
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.Response
 
 class HomeViewModel : ViewModel() {
     private val repository = CustomerDetailsRepository()
@@ -21,7 +22,7 @@ class HomeViewModel : ViewModel() {
             Callback<ApiResponse<CustomerDetailModel>> {
                 override fun onResponse(
                     call: Call<ApiResponse<CustomerDetailModel>>,
-                    response: retrofit2.Response<ApiResponse<CustomerDetailModel>>
+                    response: Response<ApiResponse<CustomerDetailModel>>
                 )   {
 
                     if (response.isSuccessful) {

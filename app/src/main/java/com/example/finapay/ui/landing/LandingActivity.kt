@@ -32,7 +32,6 @@ class LandingActivity : AppCompatActivity() {
         val tvReloadHint = findViewById<TextView>(R.id.tv_reload_hint)
         val swipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
 
-
         adapter = PlafondAdapter(mutableListOf())
         tvReloadHint.visibility = View.GONE
 

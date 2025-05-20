@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_refresh_layout"
-    android:background="@drawable/bg_header_gradient"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_header_gradient">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -30,9 +30,9 @@
 
                 <TextView
                     android:id="@+id/tv_welcome"
-                    android:layout_marginTop="24dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
                     android:text="Selamat Datang,"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
@@ -44,16 +44,17 @@
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    app:shimmer_auto_start="true"
-                    app:shimmer_duration="1000"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_welcome">
+                    app:layout_constraintTop_toBottomOf="@+id/tv_welcome"
+                    app:shimmer_auto_start="true"
+                    app:shimmer_duration="1000">
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="24dp"
                         android:background="@drawable/bg_skeleton_placeholder" />
                 </com.facebook.shimmer.ShimmerFrameLayout>
+
                 <TextView
                     android:id="@+id/tv_user_name"
                     android:layout_width="wrap_content"
@@ -86,6 +87,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tv_user_name">
 
                     <LinearLayout
+                        android:id="@+id/card_background"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -94,13 +96,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Plafond Kredit Anda"
-                            android:textColor="#757575"
+                            android:text="Sisa Plafond Kredit Anda"
+                            android:textColor="@color/white"
                             android:textSize="14sp" />
 
 
                         <com.facebook.shimmer.ShimmerFrameLayout
-                            android:id="@+id/shimmer_total"
+                            android:id="@+id/shimmer_available"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
@@ -114,12 +116,12 @@
                         </com.facebook.shimmer.ShimmerFrameLayout>
 
                         <TextView
-                            android:id="@+id/tv_total_plafond"
+                            android:id="@+id/tv_available_plafond"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Rp 0"
-                            android:textColor="@color/blue"
+                            android:textColor="@color/white"
                             android:textSize="24sp"
                             android:textStyle="bold"
                             android:visibility="gone" />
@@ -164,13 +166,13 @@
                                 android:layout_weight="1"
                                 android:gravity="start"
                                 android:text="Terpakai: Rp 0"
-                                android:textColor="#757575"
+                                android:textColor="@color/white"
                                 android:textSize="12sp"
                                 android:visibility="gone" />
 
                             <!-- Shimmer Tersedia di kanan -->
                             <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/shimmer_available"
+                                android:id="@+id/shimmer_total"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -185,13 +187,13 @@
 
                             <!-- TextView Tersedia di kanan -->
                             <TextView
-                                android:id="@+id/tv_available_plafond"
+                                android:id="@+id/tv_total_plafond"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:gravity="end"
                                 android:text="Tersedia: Rp 0"
-                                android:textColor="#757575"
+                                android:textColor="@color/white"
                                 android:textSize="12sp"
                                 android:visibility="gone" />
                         </LinearLayout>
@@ -232,10 +234,10 @@
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:background="@drawable/bg_circle_light_blue"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_outline_add_card_24"
                             android:clickable="true"
-                            android:focusable="true"/>
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_outline_add_card_24" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -299,19 +301,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical"
-                        >
+                        android:orientation="vertical">
 
                         <ImageView
                             android:id="@+id/iv_simulation"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:background="@drawable/bg_circle_light_blue"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_outline_assignment_24"
                             android:clickable="true"
                             android:focusable="true"
-                            />
+                            android:padding="12dp"
+                            android:src="@drawable/ic_outline_assignment_24" />
 
                         <TextView
                             android:layout_width="wrap_content"

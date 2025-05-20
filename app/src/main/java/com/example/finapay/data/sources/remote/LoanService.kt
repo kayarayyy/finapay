@@ -14,6 +14,9 @@ interface LoanService {
     @GET("loan-requests")
     fun getLoanRequestOnGoing(): Call<ApiResponse<List<LoanModel>>>
 
+    @GET("loan-requests/by-email")
+    fun getAllLoanRequestByEmail(): Call<ApiResponse<List<LoanModel>>>
+
     @Multipart
     @POST("loan-requests") // Ganti sesuai endpoint-mu
     fun uploadKtpImage(

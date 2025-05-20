@@ -3,6 +3,7 @@ package com.example.finapay.ui.home
 import android.app.Application
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -161,14 +162,24 @@ class HomeFragment() : Fragment() {
             viewModel.getCustomerDetails()
         }
 
-//        btnSimulation.setOnClickListener {
-//            val intent = Intent(requireContext(), SimulationActivity::class.java)
-//            startActivity(intent)
-//        }
-
         // Observasi hasil dari ViewModel
         viewModel.customerDetailsSuccess.observe(viewLifecycleOwner) { customer ->
             swipeRefreshLayout.isRefreshing = false
+
+            try {
+                val colors = intArrayOf(
+                    Color.parseColor(customer.plafond?.colorStart),
+                    Color.parseColor(customer.plafond?.colorEnd)
+                )
+                val gradientDrawable = GradientDrawable(
+                    GradientDrawable.Orientation.TL_BR, colors
+                )
+                gradientDrawable.cornerRadius = 32f
+
+                view.findViewById<View>(R.id.card_background)?.background = gradientDrawable
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            }
 
             val loanModel: List<LoanModel> = listOf(
                 LoanModel(
@@ -200,7 +211,7 @@ class HomeFragment() : Fragment() {
 
             shimmerTotal.stopShimmer()
             shimmerTotal.visibility = View.GONE
-            tvTotalPlafond.setText(customer.plafond?.amount)
+            tvTotalPlafond.setText(customer.plafond?.plan)
             tvTotalPlafond.visibility = View.VISIBLE
 
             shimmerUsed.stopShimmer()
@@ -210,7 +221,7 @@ class HomeFragment() : Fragment() {
 
             shimmerAvailable.stopShimmer()
             shimmerAvailable.visibility = View.GONE
-            tvAvailablePlafond.setText("Tersedia: " + customer.availablePlafond)
+            tvAvailablePlafond.setText(customer.availablePlafond)
             tvAvailablePlafond.visibility = View.VISIBLE
 
             shimmerName.stopShimmer()
@@ -230,7 +241,7 @@ class HomeFragment() : Fragment() {
 
             shimmerTotal.stopShimmer()
             shimmerTotal.visibility = View.GONE
-            tvTotalPlafond.setText("Rp -")
+            tvTotalPlafond.setText("-")
             tvTotalPlafond.visibility = View.VISIBLE
 
             shimmerUsed.stopShimmer()
@@ -240,7 +251,7 @@ class HomeFragment() : Fragment() {
 
             shimmerAvailable.stopShimmer()
             shimmerAvailable.visibility = View.GONE
-            tvAvailablePlafond.setText("Tersedia: Rp -")
+            tvAvailablePlafond.setText("Rp -")
             tvAvailablePlafond.visibility = View.VISIBLE
 
             shimmerName.stopShimmer()

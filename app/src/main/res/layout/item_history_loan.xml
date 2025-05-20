@@ -125,15 +125,5 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_detail_loan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/button_outline_blue"
-            android:text="Lihat Detail"
-            android:textAllCaps="false"
-            android:textColor="@color/blue" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
