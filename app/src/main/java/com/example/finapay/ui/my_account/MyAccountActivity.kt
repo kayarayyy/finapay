@@ -144,6 +144,7 @@ class MyAccountActivity : AppCompatActivity() {
         observeViewModel()
         initViews()
         setupListener()
+        disableView()
         homeViewModel.getCustomerDetails()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }

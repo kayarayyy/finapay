@@ -62,6 +62,7 @@
         <activity android:name=".ui.simulation.SimulationActivity" />
         <activity android:name=".ui.request.RequestActivity" />
         <activity android:name=".ui.my_account.MyAccountActivity" />
+        <activity android:name=".ui.setting.SettingsActivity" />
     </application>
 
 </manifest>

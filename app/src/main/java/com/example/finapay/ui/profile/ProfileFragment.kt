@@ -15,6 +15,7 @@ import com.example.finapay.R
 import com.example.finapay.ui.home.HomeViewModel
 import com.example.finapay.ui.login.LoginActivity
 import com.example.finapay.ui.my_account.MyAccountActivity
+import com.example.finapay.ui.setting.SettingsActivity
 import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.SharedPreferencesHelper
 
@@ -87,7 +88,8 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showSettingsToast() {
-        Toast.makeText(requireContext(), "Pengaturan diklik", Toast.LENGTH_SHORT).show()
+        val intent = Intent(requireContext(), SettingsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun navigateToHelp() {
