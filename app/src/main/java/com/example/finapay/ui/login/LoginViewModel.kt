@@ -23,12 +23,6 @@ class LoginViewModel : ViewModel() {
     private val _loginError = MutableLiveData<String>()
     val loginError: LiveData<String> = _loginError
 
-    private val _signInGoogleSuccess = MutableLiveData<AuthModel?>()
-    val signInGoogleSuccess: LiveData<AuthModel?> = _signInGoogleSuccess
-
-    private val _signInGoogleError = MutableLiveData<String>()
-    val signInGoogleError: LiveData<String> = _signInGoogleError
-
     fun signInGoogle(tokenId: String, fcmToken: String, context: Context) {
         repository.signInGoogle(tokenId, fcmToken).enqueue(object : Callback<ApiResponse<AuthModel>> {
             override fun onResponse(

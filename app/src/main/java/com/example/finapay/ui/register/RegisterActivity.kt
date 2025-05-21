@@ -8,6 +8,7 @@ import android.text.SpannableString
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Patterns
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -21,29 +22,97 @@ import com.example.finapay.R
 import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.login.LoginActivity
 import com.example.finapay.utils.CustomDialog
+import com.example.finapay.utils.FormUtils
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class RegisterActivity : AppCompatActivity() {
     private val viewModel: RegisterViewModel by viewModels()
+    private lateinit var formUtils: FormUtils
+
+    private lateinit var nameInput: TextInputEditText
+    private lateinit var emailInput: TextInputEditText
+    private lateinit var passwordInput: TextInputEditText
+    private lateinit var confirmPasswordInput: TextInputEditText
+
+    private lateinit var nameInputLayout: TextInputLayout
+    private lateinit var emailInputLayout: TextInputLayout
+    private lateinit var passwordInputLayout: TextInputLayout
+    private lateinit var confirmPasswordInputLayout: TextInputLayout
+
+    private lateinit var registerButton: Button
+    private lateinit var registerProgress: ProgressBar
+
+    private lateinit var bgWave2: ImageView
+    private lateinit var bgWave3: ImageView
+    private lateinit var animation: Animation
+
+    private lateinit var loginPrompt: TextView
+
+    private var loginButtonIsEnabled: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        val emailField = findViewById<EditText>(R.id.etEmail)
-        val passwordField = findViewById<EditText>(R.id.etPassword)
-        val nameField = findViewById<EditText>(R.id.etName)
-        val confirmPasswordField = findViewById<EditText>(R.id.etConfirmPassword)
-        val registerButton = findViewById<Button>(R.id.btnRegister)
-        val registerProgress = findViewById<ProgressBar>(R.id.btnProgressBar)
-        var bgWave2 = findViewById<ImageView>(R.id.bgWave2)
-        var bgWave3 = findViewById<ImageView>(R.id.bgWave3)
-        val animation = Animation()
+        initViews()
+        setupListener()
+        observeViewModel()
+    }
+
+    private fun initViews() {
+        formUtils = FormUtils()
+        nameInputLayout = findViewById(R.id.etNameLayout)
+        emailInputLayout = findViewById(R.id.etEmailLayout)
+        passwordInputLayout = findViewById(R.id.etPasswordLayout)
+        confirmPasswordInputLayout = findViewById(R.id.etConfirmPasswordLayout)
+
+        nameInput = findViewById(R.id.etName)
+        emailInput = findViewById(R.id.etEmail)
+        passwordInput = findViewById(R.id.etPassword)
+        confirmPasswordInput = findViewById(R.id.etConfirmPassword)
+
+        registerButton = findViewById(R.id.btnRegister)
+        registerProgress = findViewById(R.id.btnProgressBar)
+        registerButton.backgroundTintList = null
+        loginPrompt = findViewById(R.id.tvLoginPrompt)
+
+        bgWave2 = findViewById(R.id.bgWave2)
+        bgWave3 = findViewById(R.id.bgWave3)
+        animation = Animation()
         animation.animationslidebottom(bgWave2, 550)
         animation.animationslidebottom(bgWave3)
 
-        registerButton.backgroundTintList=null
+        setLoginPrompt()
+        formUtils.clearErrorOnInput(nameInputLayout, nameInput)
+        formUtils.clearErrorOnInput(emailInputLayout, emailInput)
+        formUtils.clearErrorOnInput(passwordInputLayout, passwordInput)
+        formUtils.clearErrorOnInput(confirmPasswordInputLayout, confirmPasswordInput)
+    }
 
+    private fun disableView() {
+        registerButton.isEnabled = false
+        nameInput.isEnabled = false
+        emailInput.isEnabled = false
+        passwordInput.isEnabled = false
+        confirmPasswordInput.isEnabled = false
+        registerButton.isEnabled = false
+        registerButton.text = ""
+        loginButtonIsEnabled = false
+    }
 
-        val textView = findViewById<TextView>(R.id.tvLoginPrompt)
+    private fun enableView() {
+        registerButton.isEnabled = true
+        nameInput.isEnabled = true
+        emailInput.isEnabled = true
+        passwordInput.isEnabled = true
+        confirmPasswordInput.isEnabled = true
+        registerButton.isEnabled = true
+        registerButton.text = "Register"
+        loginButtonIsEnabled = true
+    }
+
+    private fun setLoginPrompt() {
         val fullText = "Already have an account? Login"
         val spannable = SpannableString(fullText)
 
@@ -52,6 +121,7 @@ class RegisterActivity : AppCompatActivity() {
 
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
+                if (!loginButtonIsEnabled) return
                 val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -66,28 +136,82 @@ class RegisterActivity : AppCompatActivity() {
 
         spannable.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        textView.text = spannable
-        textView.movementMethod = LinkMovementMethod.getInstance()
-        textView.highlightColor = Color.TRANSPARENT
+        loginPrompt.text = spannable
+        loginPrompt.movementMethod = LinkMovementMethod.getInstance()
+        loginPrompt.highlightColor = Color.TRANSPARENT
 
+    }
 
-        registerButton.setOnClickListener{
+    private fun setupListener() {
+        registerButton.setOnClickListener {
+            if (!validateForm()) return@setOnClickListener
+            disableView()
             registerProgress.visibility = View.VISIBLE
-            registerButton.text = "" // Hilangkan teks "Login"
-            registerButton.isEnabled = false
 
-            val email = emailField.text.toString()
-            val password = passwordField.text.toString()
-            val name = nameField.text.toString()
-            val confirmPassword = confirmPasswordField.text.toString()
+            val email = emailInput.text.toString()
+            val password = passwordInput.text.toString()
+            val name = nameInput.text.toString()
 
             viewModel.register(email, password, name, this)
         }
+    }
 
+    private fun validateForm(): Boolean {
+        window.decorView.clearFocus()
+
+        var isValid = true
+        var firstInvalidView: View? = null
+
+        fun validateEditText(
+            layout: TextInputLayout,
+            input: TextInputEditText,
+            fieldName: String,
+            isEmail: Boolean = false
+        ) {
+            val text = input.text?.toString()?.trim()
+            if (text.isNullOrEmpty()) {
+                layout.error = "$fieldName wajib diisi"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else if (isEmail && !Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+                layout.error = "Format $fieldName tidak valid"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else {
+                layout.error = null
+            }
+        }
+
+        // Validasi masing-masing input
+        validateEditText(nameInputLayout, nameInput, "Nama")
+        validateEditText(emailInputLayout, emailInput, "Email", isEmail = true)
+        validateEditText(passwordInputLayout, passwordInput, "Password")
+        validateEditText(confirmPasswordInputLayout, confirmPasswordInput, "Konfirmasi password")
+
+        // Validasi kesesuaian password dan konfirmasi password
+        val password = passwordInput.text?.toString()?.trim()
+        val confirmPassword = confirmPasswordInput.text?.toString()?.trim()
+        if (!password.isNullOrEmpty() && !confirmPassword.isNullOrEmpty() && password != confirmPassword) {
+            confirmPasswordInputLayout.error = "Konfirmasi password tidak sesuai"
+            confirmPasswordInputLayout.boxStrokeErrorColor =
+                ContextCompat.getColorStateList(this, R.color.error_red)
+            if (firstInvalidView == null) firstInvalidView = confirmPasswordInput
+            isValid = false
+        }
+
+        firstInvalidView?.requestFocus()
+
+        return isValid
+    }
+
+    private fun observeViewModel() {
         viewModel.registerSuccess.observe(this) { user ->
+            enableView()
             registerProgress.visibility = View.GONE
-            registerButton.text = "Register"
-            registerButton.isEnabled = true
 
             user?.let {
                 CustomDialog.show(
@@ -109,9 +233,8 @@ class RegisterActivity : AppCompatActivity() {
 
 
         viewModel.registerError.observe(this) { errorMessage ->
+            enableView()
             registerProgress.visibility = View.GONE
-            registerButton.text = "Register"
-            registerButton.isEnabled = true
 
             errorMessage?.let {
                 CustomDialog.show(
@@ -127,6 +250,4 @@ class RegisterActivity : AppCompatActivity() {
 
         }
     }
-
-
 }
