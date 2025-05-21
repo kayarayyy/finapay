@@ -183,12 +183,22 @@ class HomeFragment() : Fragment() {
 
             val loanModel: List<LoanModel> = listOf(
                 LoanModel(
+                    id = "1",
                     amount = customer.plafond?.amount ?: "Rp0",
-                    tenor = "12"
+                    title = "Peminjaman #1",
+                    date = "20 Mei 2025",
+                    status = "Disetujui",
+                    tenor = "12",
+                    isApproved = true
                 ),
                 LoanModel(
+                    id = "2",
                     amount = customer.plafond?.amount ?: "Rp0",
-                    tenor = "6"
+                    title = "Peminjaman #1",
+                    date = "20 Mei 2025",
+                    status = "Disetujui",
+                    tenor = "12",
+                    isApproved = true
                 ),
             )
             adapterActiveLoan.updateData(loanModel)

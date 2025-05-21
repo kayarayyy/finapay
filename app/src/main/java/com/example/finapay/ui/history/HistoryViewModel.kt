@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.finapay.data.models.AuthModel
 import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.data.models.LoanModel
@@ -11,6 +12,7 @@ import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.LoanRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,28 +33,72 @@ class HistoryViewModel : ViewModel() {
     fun getLoanHistory() {
         _isLoading.postValue(true)
 
-        repository.getALlLoanRequestByEmail().enqueue(object : Callback<ApiResponse<List<LoanModel>>> {
-            override fun onResponse(
-                call: Call<ApiResponse<List<LoanModel>>>,
-                response: Response<ApiResponse<List<LoanModel>>>
-            ) {
-                _isLoading.postValue(false)
-
-                if (response.isSuccessful) {
-                    val data = response.body()?.data
-                    _loanHistory.postValue(data ?: emptyList())
-                } else {
-                    handleErrorResponse(response)
-                }
+        viewModelScope.launch {
+            try {
+                // Contoh implementasi: Ganti dengan panggilan repository/API yang sebenarnya
+                val result = fetchLoanHistoryFromRepo()
+                _loanHistory.value = result
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Terjadi kesalahan saat mengambil data"
+            } finally {
+                _isLoading.value = false
             }
+        }
 
-            override fun onFailure(call: Call<ApiResponse<List<LoanModel>>>, t: Throwable) {
-                _isLoading.postValue(false)
-                val errorMessage = getErrorMessage(t)
-                _error.postValue(errorMessage)
-                Log.e(TAG, "onFailure: $errorMessage", t)
-            }
-        })
+//        repository.getALlLoanRequestByEmail().enqueue(object : Callback<ApiResponse<List<LoanModel>>> {
+//            override fun onResponse(
+//                call: Call<ApiResponse<List<LoanModel>>>,
+//                response: Response<ApiResponse<List<LoanModel>>>
+//            ) {
+//                _isLoading.postValue(false)
+//
+//                if (response.isSuccessful) {
+//                    val data = response.body()?.data
+//                    _loanHistory.postValue(data ?: emptyList())
+//                } else {
+//                    handleErrorResponse(response)
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<ApiResponse<List<LoanModel>>>, t: Throwable) {
+//                _isLoading.postValue(false)
+//                val errorMessage = getErrorMessage(t)
+//                _error.postValue(errorMessage)
+//                Log.e(TAG, "onFailure: $errorMessage", t)
+//            }
+//        })
+    }
+
+    private suspend fun fetchLoanHistoryFromRepo(): List<LoanModel> {
+        return listOf(
+            LoanModel(
+                id = "1",
+                title = "Peminjaman #1",
+                date = "20 Mei 2025",
+                amount = "Rp 500.000",
+                status = "Disetujui",
+                tenor = "12",
+                isApproved = true
+            ),
+            LoanModel(
+                id = "2",
+                title = "Peminjaman #2",
+                date = "15 Mei 2025",
+                amount = "Rp 1.000.000.000",
+                status = "Ditolak",
+                tenor = "6",
+                isApproved = false
+            ),
+            LoanModel(
+                id = "3",
+                title = "Peminjaman #3",
+                date = "10 Mei 2025",
+                amount = "Rp 750.000",
+                status = "Disetujui",
+                tenor = "12",
+                isApproved = true
+            )
+        )
     }
 
     private fun handleErrorResponse(response: Response<*>) {
