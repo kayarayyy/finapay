@@ -2,6 +2,7 @@ package com.example.finapay.data.repositories
 
 import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.models.AuthModel
+import com.example.finapay.data.models.requests.ChangePasswordRequest
 import com.example.finapay.data.models.requests.GoogleSignInRequest
 import com.example.finapay.data.models.requests.LoginRequest
 import com.example.finapay.data.models.requests.RegisterRequest
@@ -22,6 +23,11 @@ class AuthRepository {
     fun register(email: String, password: String, name: String): Call<ApiResponse<AuthModel>> {
         val registerRequest = RegisterRequest(email, password, name)
         return ApiClient.authService.register(registerRequest)
+    }
+
+    fun changePassword(oldPassword: String, newPassword: String, confirmPassword: String): Call<ApiResponse<Boolean?>> {
+        val changePaswordRequest = ChangePasswordRequest(oldPassword, newPassword, confirmPassword)
+        return ApiClient.authService.changePassword(changePaswordRequest)
     }
 
     fun logout(fcmToken: String): Call<ApiResponse<Unit>> {

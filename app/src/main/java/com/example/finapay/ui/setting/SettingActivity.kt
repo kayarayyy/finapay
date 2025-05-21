@@ -1,5 +1,6 @@
 package com.example.finapay.ui.setting
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -8,9 +9,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
+import com.example.finapay.MainActivity
 import com.example.finapay.R
+import com.example.finapay.ui.change_passowrd.ChangePasswordActivity
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -49,7 +51,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         btnBack.setOnClickListener {
-            finish()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("destination", "profile")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
 
         switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
@@ -65,9 +70,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         settingChangePassword.setOnClickListener {
-            // Buka activity ubah password
-            // val intent = Intent(this, ChangePasswordActivity::class.java)
-            // startActivity(intent)
+             val intent = Intent(this, ChangePasswordActivity::class.java)
+             startActivity(intent)
         }
 
         settingPrivacy.setOnClickListener {

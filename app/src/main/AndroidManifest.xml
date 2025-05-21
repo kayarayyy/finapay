@@ -10,8 +10,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
-
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
@@ -63,6 +61,7 @@
         <activity android:name=".ui.request.RequestActivity" />
         <activity android:name=".ui.my_account.MyAccountActivity" />
         <activity android:name=".ui.setting.SettingsActivity" />
+        <activity android:name=".ui.change_passowrd.ChangePasswordActivity" />
     </application>
 
 </manifest>

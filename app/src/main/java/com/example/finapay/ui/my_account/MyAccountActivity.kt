@@ -151,7 +151,9 @@ class MyAccountActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.error.observe(this) { error ->
-            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+            enableView()
+            progressBar.visibility = View.GONE
+            submitButton.text = "Submit"
         }
         viewModel.isLoading.observe(this) { isLoading ->
             // TODO: tampilkan/hilangkan loading indicator
