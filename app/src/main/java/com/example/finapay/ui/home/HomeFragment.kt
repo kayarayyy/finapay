@@ -64,6 +64,7 @@ class HomeFragment() : Fragment() {
     private lateinit var cardBackground: View
 
     private var canRequest: Boolean? = false
+    private var onInternet: Boolean? = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -87,7 +88,8 @@ class HomeFragment() : Fragment() {
 
     private fun setupStatusBar() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            val controller = WindowCompat.getInsetsController(requireActivity().window, requireView())
+            val controller =
+                WindowCompat.getInsetsController(requireActivity().window, requireView())
             controller?.show(WindowInsetsCompat.Type.statusBars())
         }
     }
@@ -166,6 +168,7 @@ class HomeFragment() : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             startShimmerAnimation()
             hideDataViews()
+            onInternet = true
             viewModel.getCustomerDetails()
         }
 
@@ -191,17 +194,49 @@ class HomeFragment() : Fragment() {
     private fun observeViewModel() {
         // Success Observer
         viewModel.customerDetailsSuccess.observe(viewLifecycleOwner) { customer ->
-            handleCustomerDetailsSuccess(customer)
+            swipeRefreshLayout.isRefreshing = false
+
+            setupCardBackground(customer)
+            updateActiveLoanData(customer)
+            updatePaymentData()
+            updateUserInfo(customer)
+
+            stopShimmerAnimation()
+            showDataViews()
+            canRequest = true
+            onInternet = true
         }
 
         // Error Observer
         viewModel.customerDetailsError.observe(viewLifecycleOwner) { error ->
-            handleCustomerDetailsError()
+            swipeRefreshLayout.isRefreshing = false
+
+            stopShimmerAnimation()
+            setErrorStateData()
+            showDataViews()
+            canRequest = false
+            onInternet = true
+        }
+
+        viewModel.internetErrorError.observe(viewLifecycleOwner) { error ->
+            swipeRefreshLayout.isRefreshing = false
+            stopShimmerAnimation()
+            setErrorStateData()
+            showDataViews()
+            canRequest = false
+            onInternet = false
         }
     }
 
     private fun startShimmerAnimation() {
-        listOf(shimmerTotal, shimmerUsed, shimmerAvailable, shimmerActiveLoan, shimmerNextPayment, shimmerName)
+        listOf(
+            shimmerTotal,
+            shimmerUsed,
+            shimmerAvailable,
+            shimmerActiveLoan,
+            shimmerNextPayment,
+            shimmerName
+        )
             .forEach { shimmer ->
                 shimmer.startShimmer()
                 shimmer.visibility = View.VISIBLE
@@ -209,7 +244,14 @@ class HomeFragment() : Fragment() {
     }
 
     private fun stopShimmerAnimation() {
-        listOf(shimmerTotal, shimmerUsed, shimmerAvailable, shimmerActiveLoan, shimmerNextPayment, shimmerName)
+        listOf(
+            shimmerTotal,
+            shimmerUsed,
+            shimmerAvailable,
+            shimmerActiveLoan,
+            shimmerNextPayment,
+            shimmerName
+        )
             .forEach { shimmer ->
                 shimmer.stopShimmer()
                 shimmer.visibility = View.GONE
@@ -231,19 +273,6 @@ class HomeFragment() : Fragment() {
         tvAvailablePlafond.visibility = View.VISIBLE
         rvActiveLoan.visibility = View.VISIBLE
         rvNextPayment.visibility = View.VISIBLE
-    }
-
-    private fun handleCustomerDetailsSuccess(customer: CustomerDetailModel) {
-        swipeRefreshLayout.isRefreshing = false
-
-        setupCardBackground(customer)
-        updateActiveLoanData(customer)
-        updatePaymentData()
-        updateUserInfo(customer)
-
-        stopShimmerAnimation()
-        showDataViews()
-        canRequest = true
     }
 
     private fun setupCardBackground(customer: CustomerDetailModel) {
@@ -279,15 +308,6 @@ class HomeFragment() : Fragment() {
         tvUsedPlafond.setText("Terpakai: ${customer.usedPlafond}")
         tvAvailablePlafond.setText(customer.availablePlafond)
         tvUserName.setText(customer.user?.name)
-    }
-
-    private fun handleCustomerDetailsError() {
-        swipeRefreshLayout.isRefreshing = false
-
-        stopShimmerAnimation()
-        setErrorStateData()
-        showDataViews()
-        canRequest = false
     }
 
     private fun setErrorStateData() {
@@ -348,10 +368,14 @@ class HomeFragment() : Fragment() {
     }
 
     private fun handleRequestButtonClick() {
-        if (canRequest == true) {
-            navigateToRequestActivity()
+        if (onInternet == true) {
+            if (canRequest == false) {
+                showDataIncompleteDialog()
+            } else {
+                navigateToRequestActivity()
+            }
         } else {
-            showDataIncompleteDialog()
+            showFeatureNotAvailableDialog("ajukan")
         }
     }
 

@@ -17,6 +17,8 @@ class HomeViewModel : ViewModel() {
     val customerDetailsSuccess: LiveData<CustomerDetailModel> = _customerDetailsSuccess
     private val _customerDetailsError = MutableLiveData<ApiResponse<String>>()
     val customerDetailsError: LiveData<ApiResponse<String>> = _customerDetailsError
+    private val _internetErrorError = MutableLiveData<ApiResponse<String>>()
+    val internetErrorError: LiveData<ApiResponse<String>> = _internetErrorError
 
     fun getCustomerDetails() {
         repository.getCustomerDetailByEmail().enqueue(object :
@@ -48,9 +50,8 @@ class HomeViewModel : ViewModel() {
                 override fun onFailure(call: Call<ApiResponse<CustomerDetailModel>>, t: Throwable) {
                     Log.e("API Response", t.toString())
                     ApiResponse("failed", "Gagal terhubung ke server", "", 408)?.let {
-                        _customerDetailsError.postValue(
-                            it
-                        )
+                        _customerDetailsError.postValue(it)
+                        _internetErrorError.postValue(it)
                     }
                 }
             }
