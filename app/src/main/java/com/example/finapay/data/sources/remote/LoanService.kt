@@ -15,7 +15,7 @@ interface LoanService {
     fun getLoanRequestOnGoing(): Call<ApiResponse<List<LoanModel>>>
 
     @GET("loan-requests/by-email")
-    fun getAllLoanRequestByEmail(): Call<ApiResponse<List<LoanModel>>>
+    suspend fun getAllLoanRequestByEmail(): ApiResponse<List<LoanModel>>
 
     @Multipart
     @POST("loan-requests") // Ganti sesuai endpoint-mu

@@ -18,9 +18,6 @@ enum class LoanStatus {
     REJECTED
 }
 
-/**
- * Fragment yang menampilkan daftar peminjaman berdasarkan status
- */
 class LoanStatusFragment : Fragment() {
 
     private lateinit var viewModel: HistoryViewModel
@@ -39,9 +36,6 @@ class LoanStatusFragment : Fragment() {
     companion object {
         private const val ARG_STATUS = "loan_status"
 
-        /**
-         * Factory method untuk membuat instance baru dari fragment ini
-         */
         fun newInstance(status: LoanStatus): LoanStatusFragment {
             val fragment = LoanStatusFragment()
             val args = Bundle()
@@ -76,49 +70,30 @@ class LoanStatusFragment : Fragment() {
         observeViewModel()
     }
 
-    /**
-     * Inisialisasi ViewModel (shared dengan parent fragment)
-     */
     private fun initViewModel() {
-        // Menggunakan ViewModel yang sama dengan parent fragment
         viewModel = ViewModelProvider(requireParentFragment())[HistoryViewModel::class.java]
     }
 
-    /**
-     * Inisialisasi semua view yang dibutuhkan
-     */
     private fun initViews(view: View) {
         recyclerView = view.findViewById(R.id.rv_loan_history)
         swipeRefresh = view.findViewById(R.id.swipe_refresh)
         emptyText = view.findViewById(R.id.tv_empty_data)
     }
 
-    /**
-     * Setup RecyclerView dan adapter
-     */
     private fun setupRecyclerView() {
         adapter = HistoryLoanAdapter(mutableListOf())
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    /**
-     * Setup semua listener
-     */
     private fun setupListeners() {
         swipeRefresh.setOnRefreshListener {
-            // Refresh data ketika swipe down
             (parentFragment as? HistoryFragment)?.refreshData()
         }
     }
 
-    /**
-     * Observasi LiveData dari ViewModel
-     */
     private fun observeViewModel() {
-        // Observasi data riwayat peminjaman
         viewModel.loanHistory.observe(viewLifecycleOwner) { allLoans ->
-            // Filter berdasarkan status
             val filteredLoans = allLoans.filter { loan ->
                 when (loanStatus) {
                     LoanStatus.APPROVED -> loan.isApproved
@@ -126,19 +101,15 @@ class LoanStatusFragment : Fragment() {
                 }
             }
 
-            // Update RecyclerView
             adapter.updateData(filteredLoans)
 
-            // Tampilkan/sembunyikan text "Tidak ada data"
             emptyText.visibility = if (filteredLoans.isEmpty()) View.VISIBLE else View.GONE
 
-            // Hentikan animasi refresh jika sedang berjalan
             if (swipeRefresh.isRefreshing) {
                 swipeRefresh.isRefreshing = false
             }
         }
 
-        // Observasi status loading
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (!isLoading && swipeRefresh.isRefreshing) {
                 swipeRefresh.isRefreshing = false

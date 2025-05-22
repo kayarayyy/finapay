@@ -15,7 +15,9 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 
 class HistoryViewModel : ViewModel() {
 
@@ -35,105 +37,32 @@ class HistoryViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Contoh implementasi: Ganti dengan panggilan repository/API yang sebenarnya
-                val result = fetchLoanHistoryFromRepo()
-                _loanHistory.value = result
+                val response = repository.getAllLoanRequestByEmail()
+                if (response.status == "success" && response.data != null) {
+                    _loanHistory.postValue(response.data)
+                } else {
+                    _error.postValue(response.message ?: "Gagal mengambil data")
+                }
+            } catch (e: HttpException) {
+                val message = when (e.code()) {
+                    400 -> "Data yang dikirim tidak valid"
+                    401 -> "Sesi telah berakhir, silakan login kembali"
+                    403 -> "Anda tidak memiliki akses untuk fitur ini"
+                    404 -> "Layanan tidak ditemukan"
+                    in 500..599 -> "Terjadi gangguan pada server, coba lagi nanti"
+                    else -> "Terjadi kesalahan: ${e.code()}"
+                }
+                _error.postValue(message)
+                Log.e(TAG, "HttpException: ${e.code()} - ${e.message()}", e)
+            } catch (e: IOException) {
+                _error.postValue("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.")
+                Log.e(TAG, "IOException: ${e.message}", e)
             } catch (e: Exception) {
-                _error.value = e.message ?: "Terjadi kesalahan saat mengambil data"
+                _error.postValue("Terjadi kesalahan: ${e.message}")
+                Log.e(TAG, "Exception: ${e.message}", e)
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false)
             }
-        }
-
-//        repository.getALlLoanRequestByEmail().enqueue(object : Callback<ApiResponse<List<LoanModel>>> {
-//            override fun onResponse(
-//                call: Call<ApiResponse<List<LoanModel>>>,
-//                response: Response<ApiResponse<List<LoanModel>>>
-//            ) {
-//                _isLoading.postValue(false)
-//
-//                if (response.isSuccessful) {
-//                    val data = response.body()?.data
-//                    _loanHistory.postValue(data ?: emptyList())
-//                } else {
-//                    handleErrorResponse(response)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ApiResponse<List<LoanModel>>>, t: Throwable) {
-//                _isLoading.postValue(false)
-//                val errorMessage = getErrorMessage(t)
-//                _error.postValue(errorMessage)
-//                Log.e(TAG, "onFailure: $errorMessage", t)
-//            }
-//        })
-    }
-
-    private suspend fun fetchLoanHistoryFromRepo(): List<LoanModel> {
-        return listOf(
-            LoanModel(
-                id = "1",
-                title = "Peminjaman #1",
-                date = "20 Mei 2025",
-                amount = "Rp 500.000",
-                status = "Disetujui",
-                tenor = "12",
-                isApproved = true
-            ),
-            LoanModel(
-                id = "2",
-                title = "Peminjaman #2",
-                date = "15 Mei 2025",
-                amount = "Rp 1.000.000.000",
-                status = "Ditolak",
-                tenor = "6",
-                isApproved = false
-            ),
-            LoanModel(
-                id = "3",
-                title = "Peminjaman #3",
-                date = "10 Mei 2025",
-                amount = "Rp 750.000",
-                status = "Disetujui",
-                tenor = "12",
-                isApproved = true
-            )
-        )
-    }
-
-    private fun handleErrorResponse(response: Response<*>) {
-        val gson = Gson()
-        val type = object : TypeToken<ApiResponse<Any>>() {}.type
-
-        val errorBody = response.errorBody()?.charStream()
-        val errorResponse: ApiResponse<Any>? = try {
-            gson.fromJson(errorBody, type)
-        } catch (e: Exception) {
-            null
-        }
-
-        val errorMessage = when (response.code()) {
-            400 -> errorResponse?.message ?: "Data yang dikirim tidak valid"
-            401 -> "Sesi telah berakhir, silakan login kembali"
-            403 -> "Anda tidak memiliki akses untuk fitur ini"
-            404 -> "Layanan tidak ditemukan"
-            in 500..599 -> "Terjadi gangguan pada server, coba lagi nanti"
-            else -> "Terjadi kesalahan: ${response.code()}"
-        }
-
-        Log.e(TAG, "API error: ${response.code()} - ${errorResponse?.message}")
-        _error.postValue(errorMessage)
-    }
-
-    private fun getErrorMessage(throwable: Throwable): String {
-        return when {
-            throwable.message?.contains("timeout", ignoreCase = true) == true ->
-                "Koneksi timeout, periksa jaringan Anda"
-            throwable.message?.contains("Unable to resolve host", ignoreCase = true) == true ->
-                "Tidak dapat terhubung ke server, periksa koneksi internet Anda"
-            throwable.message?.contains("Failed to connect", ignoreCase = true) == true ->
-                "Tidak dapat terhubung ke server, periksa koneksi internet Anda"
-            else -> "Terjadi kesalahan: ${throwable.message}"
         }
     }
 

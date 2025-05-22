@@ -14,6 +14,7 @@ class HistoryLoanAdapter(private var items: MutableList<LoanModel>) :
     inner class HistoryLoanViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val amount = itemView.findViewById<TextView>(R.id.tv_total_loan)
         val tenor = itemView.findViewById<TextView>(R.id.tv_tenor)
+        val status = itemView.findViewById<TextView>(R.id.tv_status)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryLoanViewHolder {
@@ -26,6 +27,14 @@ class HistoryLoanAdapter(private var items: MutableList<LoanModel>) :
         val item = items[position]
         holder.amount.text = item.amount
         holder.tenor.text = item.tenor
+        if (item.isApproved == true) {
+            holder.status.text = "Disetujui"
+            holder.status.setBackgroundResource(R.drawable.status_bg_active)
+        } else {
+            holder.status.text = "Ditolak"
+            holder.status.setBackgroundResource(R.drawable.color_button_red)
+        }
+
     }
 
     fun updateData(newItems: List<LoanModel>) {
