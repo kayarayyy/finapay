@@ -1,12 +1,8 @@
 package com.example.finapay.ui.request
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
-import android.graphics.Typeface
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.finapay.MainActivity
@@ -30,6 +27,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.text.NumberFormat
+import java.util.Locale
 
 class RequestActivity : AppCompatActivity() {
 
@@ -37,49 +36,66 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var formUtils: FormUtils
 
+    // UI Components
     private lateinit var progressBar: View
-
     private lateinit var locationTextView: TextView
     private lateinit var locationErrorTextView: TextView
-
     private lateinit var amountInput: TextInputEditText
     private lateinit var refferalInput: TextInputEditText
-
     private lateinit var amountInputLayout: TextInputLayout
     private lateinit var refferalInputLayout: TextInputLayout
-
     private lateinit var tenorRadioGroup: RadioGroup
     private lateinit var tenor6: RadioButton
     private lateinit var tenor12: RadioButton
     private lateinit var tenor24: RadioButton
-
     private lateinit var refreshLocationButton: MaterialButton
     private lateinit var submitButton: MaterialButton
+
+    // Preview Components
+    private lateinit var previewCard: CardView
+    private lateinit var valueLoanAmount: TextView
+    private lateinit var valueAdminFee: TextView
+    private lateinit var valueInterestRate: TextView
+    private lateinit var valueTotalInterest: TextView
+    private lateinit var valueAmountReceived: TextView
+    private lateinit var valueMonthlyInstallment: TextView
+    private lateinit var valueTotalPayment: TextView
 
     private val LOCATION_PERMISSION_CODE = 1001
     private var currentLat: Double? = null
     private var currentLon: Double? = null
-
-    private var submitButtonIsEnabled: Boolean = true
     private var isEditing = false
+    private var submitButtonEnabled = true
+
+    // Loan calculation constants
+    companion object {
+        private const val ADMIN_FEE_PERCENTAGE = 0.05 // 5%
+        private const val INTEREST_RATE_6_MONTHS = 0.02 // 2% per month
+        private const val INTEREST_RATE_12_MONTHS = 0.018 // 1.8% per month
+        private const val INTEREST_RATE_24_MONTHS = 0.015 // 1.5% per month
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request)
 
+        setupStatusBar()
+        initViews()
+        setupListeners()
+        observeViewModel()
+    }
+
+    private fun setupStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
         }
-
-        observeViewModel()
-        initViews()
-        setupListeners()
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     private fun initViews() {
         formUtils = FormUtils()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        // Main UI Components
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
         amountInput = findViewById(R.id.amount_input)
@@ -94,87 +110,20 @@ class RequestActivity : AppCompatActivity() {
         submitButton = findViewById(R.id.submit_button)
         progressBar = findViewById(R.id.loading_indicator)
 
+        // Preview Components
+        previewCard = findViewById(R.id.preview_card)
+        valueLoanAmount = findViewById(R.id.value_loan_amount)
+        valueAdminFee = findViewById(R.id.value_admin_fee)
+        valueInterestRate = findViewById(R.id.value_interest_rate)
+        valueTotalInterest = findViewById(R.id.value_total_interest)
+        valueAmountReceived = findViewById(R.id.value_amount_received)
+        valueMonthlyInstallment = findViewById(R.id.value_monthly_installment)
+        valueTotalPayment = findViewById(R.id.value_total_payment)
+
         setRadioButtonColor(R.id.tenor_6)
         setRadioButtonColor(R.id.tenor_12)
         setRadioButtonColor(R.id.tenor_24)
-
         formUtils.clearErrorOnInput(amountInputLayout, amountInput)
-    }
-
-    private fun disableView() {
-        submitButtonIsEnabled = false
-        refferalInput.isEnabled = false
-        amountInput.isEnabled = false
-        tenorRadioGroup.isEnabled = false
-        tenor6.isEnabled = false
-        tenor12.isEnabled = false
-        tenor24.isEnabled = false
-        refreshLocationButton.isEnabled = false
-    }
-
-    private fun enableView() {
-        submitButtonIsEnabled = true
-        refferalInput.isEnabled = true
-        amountInput.isEnabled = true
-        tenorRadioGroup.isEnabled = true
-        tenor6.isEnabled = true
-        tenor12.isEnabled = true
-        tenor24.isEnabled = true
-        refreshLocationButton.isEnabled = true
-        submitButton.isEnabled = true
-    }
-
-    private fun setRadioButtonColor(id: Int) {
-        val radio = findViewById<RadioButton>(id)
-        radio.buttonTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.blue_primary))
-    }
-
-    private fun setupListeners() {
-        amountInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                if (isEditing) return
-                isEditing = true
-                val input = s.toString().replace(".", "").replace("Rp", "").replace(" ", "")
-                if (input.isNotEmpty()) {
-                    val formatted = formatToCurrency(input)
-                    amountInput.setText(formatted)
-                    amountInput.setSelection(formatted.length)
-                }
-                isEditing = false
-            }
-        })
-        refreshLocationButton.setOnClickListener { checkLocationPermissionAndFetch() }
-        submitButton.setOnClickListener {
-            if (submitButtonIsEnabled) {
-                submitData()
-            }
-        }
-        tenorRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-            val blueColor = ContextCompat.getColorStateList(this, R.color.blue)
-            val grayColor = ContextCompat.getColorStateList(this, R.color.gray)
-
-            when (checkedId) {
-                R.id.tenor_6 -> {
-                    tenor6.buttonTintList = blueColor
-                    tenor12.buttonTintList = grayColor
-                    tenor24.buttonTintList = grayColor
-                }
-                R.id.tenor_12 -> {
-                    tenor6.buttonTintList = grayColor
-                    tenor12.buttonTintList = blueColor
-                    tenor24.buttonTintList = grayColor
-                }
-                R.id.tenor_24 -> {
-                    tenor6.buttonTintList = grayColor
-                    tenor12.buttonTintList = grayColor
-                    tenor24.buttonTintList = blueColor
-                }
-            }
-        }
     }
 
     private fun observeViewModel() {
@@ -187,12 +136,13 @@ class RequestActivity : AppCompatActivity() {
                 primaryButtonText = "OK",
                 primaryButtonBackgroundRes = R.drawable.color_button_blue,
                 onPrimaryClick = {
-                    val intent = Intent(this, MainActivity::class.java) // ✅ BENAR
+                    val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 },
                 iconColor = R.color.blue
             )
+            enableView()
         }
 
         viewModel.uploadError.observe(this) { error ->
@@ -221,16 +171,262 @@ class RequestActivity : AppCompatActivity() {
         }
     }
 
-    private fun submitData(){
-        if (!validateForm()) return
-        val amount = amountInput.text.toString()
-        val referral = refferalInput.text.toString()
-        val tenor = when (tenorRadioGroup.checkedRadioButtonId) {
+    private fun disableView() {
+        refferalInput.isEnabled = false
+        amountInput.isEnabled = false
+        tenorRadioGroup.isEnabled = false
+        tenor6.isEnabled = false
+        tenor12.isEnabled = false
+        tenor24.isEnabled = false
+        refreshLocationButton.isEnabled = false
+        submitButtonEnabled = false
+    }
+
+    private fun enableView() {
+        refferalInput.isEnabled = true
+        amountInput.isEnabled = true
+        tenorRadioGroup.isEnabled = true
+        tenor6.isEnabled = true
+        tenor12.isEnabled = true
+        tenor24.isEnabled = true
+        refreshLocationButton.isEnabled = true
+        submitButtonEnabled = true
+    }
+
+    private fun setupListeners() {
+        amountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isEditing) return
+                isEditing = true
+
+                val input = s.toString().replace(".", "").replace("Rp", "").replace(" ", "")
+                if (input.isNotEmpty()) {
+                    val formatted = formatToCurrency(input)
+                    amountInput.setText(formatted)
+                    amountInput.setSelection(formatted.length)
+                }
+
+                isEditing = false
+                updateLoanPreview()
+            }
+        })
+        tenorRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            updateRadioButtonColors(checkedId)
+            updateLoanPreview()
+        }
+        refreshLocationButton.setOnClickListener {
+            getCurrentLocation()
+        }
+        submitButton.setOnClickListener {
+            if (!validateForm()) return@setOnClickListener
+            if (!submitButtonEnabled) return@setOnClickListener
+            submitLoanRequest()
+        }
+    }
+
+    private fun formatToCurrency(input: String): String {
+        return try {
+            val number = input.toLong()
+            val formatter = NumberFormat.getNumberInstance(Locale("id", "ID"))
+            "${formatter.format(number)}"
+        } catch (e: NumberFormatException) {
+            input
+        }
+    }
+
+    private fun parseCurrencyToLong(currency: String): Long {
+        return try {
+            currency.replace("Rp", "").replace(".", "").replace(" ", "").toLong()
+        } catch (e: NumberFormatException) {
+            0L
+        }
+    }
+
+    private fun updateRadioButtonColors(checkedId: Int) {
+        // Reset all radio buttons to default color
+        setRadioButtonColor(R.id.tenor_6, false)
+        setRadioButtonColor(R.id.tenor_12, false)
+        setRadioButtonColor(R.id.tenor_24, false)
+
+        // Set selected radio button to primary color
+        setRadioButtonColor(checkedId, true)
+    }
+
+    private fun setRadioButtonColor(radioButtonId: Int, isSelected: Boolean = false) {
+        val radioButton = findViewById<RadioButton>(radioButtonId)
+        val colorRes = if (isSelected) {
+            R.color.blue
+        } else {
+            R.color.gray
+        }
+
+        radioButton.buttonTintList = ContextCompat.getColorStateList(this, colorRes)
+        radioButton.setTextColor(ContextCompat.getColor(this, colorRes))
+    }
+
+    private fun updateLoanPreview() {
+        val amountText = amountInput.text.toString()
+        if (amountText.isEmpty()) {
+            previewCard.visibility = View.GONE
+            return
+        }
+
+        val loanAmount = parseCurrencyToLong(amountText)
+        if (loanAmount <= 0) {
+            previewCard.visibility = View.GONE
+            return
+        }
+
+        val selectedTenor = getSelectedTenor()
+        if (selectedTenor == 0) {
+            previewCard.visibility = View.GONE
+            return
+        }
+
+        calculateAndDisplayLoan(loanAmount, selectedTenor)
+        previewCard.visibility = View.VISIBLE
+    }
+
+    private fun getSelectedTenor(): Int {
+        return when (tenorRadioGroup.checkedRadioButtonId) {
             R.id.tenor_6 -> 6
             R.id.tenor_12 -> 12
             R.id.tenor_24 -> 24
-            else -> null
+            else -> 0
         }
+    }
+
+    private fun getInterestRate(tenor: Int): Double {
+        return when (tenor) {
+            6 -> INTEREST_RATE_6_MONTHS
+            12 -> INTEREST_RATE_12_MONTHS
+            24 -> INTEREST_RATE_24_MONTHS
+            else -> 0.0
+        }
+    }
+
+    private fun calculateAndDisplayLoan(loanAmount: Long, tenor: Int) {
+        val adminFee = (loanAmount * ADMIN_FEE_PERCENTAGE).toLong()
+        val amountReceived = loanAmount - adminFee
+        val monthlyInterestRate = getInterestRate(tenor)
+        val totalInterest = (loanAmount * monthlyInterestRate * tenor).toLong()
+        val totalPayment = loanAmount + totalInterest
+        val monthlyInstallment = totalPayment / tenor
+
+        // Update preview values
+        valueLoanAmount.text = formatToCurrency(loanAmount.toString())
+        valueAdminFee.text = formatToCurrency(adminFee.toString())
+        valueInterestRate.text = "${(monthlyInterestRate * 100).format(1)}% per bulan"
+        valueTotalInterest.text = formatToCurrency(totalInterest.toString())
+        valueAmountReceived.text = formatToCurrency(amountReceived.toString())
+        valueMonthlyInstallment.text = formatToCurrency(monthlyInstallment.toString())
+        valueTotalPayment.text = formatToCurrency(totalPayment.toString())
+    }
+
+    private fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
+    private fun getCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_CODE
+            )
+            return
+        }
+
+        showLocationLoading(true)
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            showLocationLoading(false)
+            if (location != null) {
+                currentLat = location.latitude
+                currentLon = location.longitude
+                updateLocationDisplay(location.latitude, location.longitude)
+                hideLocationError()
+            } else {
+                showLocationError("Tidak dapat mendapatkan lokasi. Pastikan GPS aktif.")
+            }
+        }.addOnFailureListener {
+            showLocationLoading(false)
+            showLocationError("Gagal mendapatkan lokasi: ${it.message}")
+        }
+    }
+
+    private fun showLocationLoading(show: Boolean) {
+        if (show) {
+            locationTextView.text = "Mendapatkan lokasi..."
+        }
+        refreshLocationButton.isEnabled = !show
+    }
+
+    private fun updateLocationDisplay(lat: Double, lon: Double) {
+        locationTextView.text = "Lat: ${lat.format(6)}, Lon: ${lon.format(6)}"
+    }
+
+    private fun showLocationError(message: String) {
+        locationErrorTextView.text = message
+        locationErrorTextView.visibility = View.VISIBLE
+        locationTextView.text = "Lokasi tidak tersedia"
+    }
+
+    private fun hideLocationError() {
+        locationErrorTextView.visibility = View.GONE
+    }
+
+    private fun validateForm(): Boolean {
+        window.decorView.clearFocus()
+
+        var isValid = true
+        var firstInvalidView: View? = null
+
+        fun validateEditText(layout: TextInputLayout, input: TextInputEditText, message: String) {
+            if (input.text.isNullOrBlank()) {
+                layout.error = "$message"
+                layout.boxStrokeErrorColor =
+                    ContextCompat.getColorStateList(this, R.color.error_red)
+                if (firstInvalidView == null) firstInvalidView = input
+                isValid = false
+            } else {
+                layout.error = null
+            }
+        }
+
+        validateEditText(amountInputLayout, amountInput, "Jumlah pinjaman wajib diisi")
+
+        if (tenorRadioGroup.checkedRadioButtonId == -1) {
+            isValid = false
+            val redColor = ContextCompat.getColorStateList(this, R.color.error_red)
+            tenor6.buttonTintList = redColor
+            tenor12.buttonTintList = redColor
+            tenor24.buttonTintList = redColor
+        }
+
+        // Validate location
+        if (currentLat == null || currentLon == null) {
+            showLocationError("Lokasi harus diisi. Tekan tombol refresh untuk mendapatkan lokasi.")
+            isValid = false
+        }
+
+        firstInvalidView?.requestFocus()
+
+        return isValid
+    }
+
+    private fun submitLoanRequest() {
+        val referral = refferalInput.text.toString()
+        val amount = amountInput.text.toString()
+        val tenor = getSelectedTenor().toString()
+        val latitude = currentLat.toString()
+        val longitude = currentLon.toString()
+
         CustomDialog.show(
             context = this,
             iconRes = R.drawable.ic_baseline_assignment_add_24,
@@ -241,93 +437,10 @@ class RequestActivity : AppCompatActivity() {
             secondaryButtonText = "Batal",
             secondaryButtonBackgroundRes = R.drawable.color_button_gray,
             onPrimaryClick = {
-                viewModel.uploadPengajuan(referral, amount, tenor.toString(), currentLat.toString(), currentLon.toString())
+                viewModel.uploadPengajuan(referral, amount, tenor, latitude, longitude)
             },
             iconColor = R.color.blue,
         )
-    }
-
-    private fun validateForm(): Boolean {
-        window.decorView.clearFocus()
-
-        var isValid = true
-        var firstInvalidView: View? = null
-
-        fun validateEditText(layout: TextInputLayout, input: TextInputEditText, fieldName: String) {
-            if (input.text.isNullOrBlank()) {
-                layout.error = "$fieldName wajib diisi"
-                layout.boxStrokeErrorColor =
-                    ContextCompat.getColorStateList(this, R.color.error_red)
-                if (firstInvalidView == null) firstInvalidView = input
-                isValid = false
-            } else {
-                layout.error = null
-            }
-        }
-
-        validateEditText(amountInputLayout, amountInput, "Amount")
-
-        if (tenorRadioGroup.checkedRadioButtonId == -1) {
-            isValid = false
-            val redColor = ContextCompat.getColorStateList(this, R.color.error_red)
-            tenor6.buttonTintList = redColor
-            tenor12.buttonTintList = redColor
-            tenor24.buttonTintList = redColor
-        }
-
-        if (currentLat == null || currentLon == null) {
-            locationErrorTextView.visibility = View.VISIBLE
-            locationErrorTextView.text = "Lokasi belum dipilih"
-            isValid = false
-            if (firstInvalidView == null) firstInvalidView = locationTextView
-        } else {
-            locationErrorTextView.visibility = View.GONE
-        }
-
-        firstInvalidView?.requestFocus()
-
-        return isValid
-    }
-
-    private fun formatToCurrency(value: String): String {
-        return try {
-            val parsed = value.toLong()
-            String.format("%,d", parsed).replace(",", ".")
-        } catch (e: NumberFormatException) {
-            ""
-        }
-    }
-
-    private fun checkLocationPermissionAndFetch() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            getLastLocation()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_CODE
-            )
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun getLastLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                currentLat = location.latitude
-                currentLon = location.longitude
-                locationTextView.text = "Lokasi: $currentLat, $currentLon"
-                locationTextView.setTextColor(ContextCompat.getColor(this, R.color.black))
-                locationTextView.setTypeface(null, Typeface.ITALIC)
-                locationErrorTextView.visibility = View.GONE
-            } else {
-                Toast.makeText(this, "Gagal mendapatkan lokasi", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -336,13 +449,15 @@ class RequestActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_CODE &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
-            getLastLocation()
-        } else {
-            Toast.makeText(this, "Izin lokasi ditolak", Toast.LENGTH_SHORT).show()
+
+        when (requestCode) {
+            LOCATION_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCurrentLocation()
+                } else {
+                    showLocationError("Izin lokasi diperlukan untuk mengajukan pinjaman")
+                }
+            }
         }
     }
 }

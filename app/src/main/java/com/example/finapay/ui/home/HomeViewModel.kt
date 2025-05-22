@@ -1,5 +1,6 @@
 package com.example.finapay.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,13 +19,14 @@ class HomeViewModel : ViewModel() {
     val customerDetailsError: LiveData<ApiResponse<String>> = _customerDetailsError
 
     fun getCustomerDetails() {
+        Log.d("API Response", "Getting customer details")
         repository.getCustomerDetailByEmail().enqueue(object :
             Callback<ApiResponse<CustomerDetailModel>> {
                 override fun onResponse(
                     call: Call<ApiResponse<CustomerDetailModel>>,
                     response: Response<ApiResponse<CustomerDetailModel>>
                 )   {
-
+                    Log.d("API Response", response.toString())
                     if (response.isSuccessful) {
                         val customerDetailsResponse = response.body()?.data
                         if (customerDetailsResponse != null) {
@@ -45,6 +47,7 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 override fun onFailure(call: Call<ApiResponse<CustomerDetailModel>>, t: Throwable) {
+                    Log.e("API Response", t.toString())
                     ApiResponse("failed", "Gagal terhubung ke server", "", 408)?.let {
                         _customerDetailsError.postValue(
                             it
