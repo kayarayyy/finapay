@@ -197,8 +197,6 @@
                                 android:textSize="12sp"
                                 android:visibility="gone" />
                         </LinearLayout>
-
-
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </androidx.constraintlayout.widget.ConstraintLayout>

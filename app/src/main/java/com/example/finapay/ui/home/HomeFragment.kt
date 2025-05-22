@@ -357,6 +357,7 @@ class HomeFragment() : Fragment() {
 
     private fun navigateToRequestActivity() {
         val intent = Intent(requireContext(), RequestActivity::class.java)
+        intent.putExtra("customer", viewModel.customerDetailsSuccess.value)
         startActivity(intent)
     }
 

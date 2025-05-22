@@ -19,7 +19,6 @@ class HomeViewModel : ViewModel() {
     val customerDetailsError: LiveData<ApiResponse<String>> = _customerDetailsError
 
     fun getCustomerDetails() {
-        Log.d("API Response", "Getting customer details")
         repository.getCustomerDetailByEmail().enqueue(object :
             Callback<ApiResponse<CustomerDetailModel>> {
                 override fun onResponse(

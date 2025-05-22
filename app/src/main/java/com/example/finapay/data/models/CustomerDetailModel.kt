@@ -1,5 +1,9 @@
 package com.example.finapay.data.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class CustomerDetailModel(
 	val id: String? = null,
 	val street: String? = null,
@@ -27,7 +31,7 @@ data class CustomerDetailModel(
 	val plafond: PlafondModel? = null,
 	val availablePlafond: String? = null,
 	val usedPlafond: String? = null,
-	val user: UserModel? = null,
-)
+	val user: UserModel? = null
+) : Parcelable
 
 

@@ -3,10 +3,13 @@ package com.example.finapay.ui.request
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.RadioButton
@@ -20,6 +23,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.finapay.MainActivity
 import com.example.finapay.R
+import com.example.finapay.data.models.CustomerDetailModel
+import com.example.finapay.ui.home.HomeViewModel
 import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.FormUtils
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,6 +38,7 @@ import java.util.Locale
 class RequestActivity : AppCompatActivity() {
 
     private val viewModel: RequestViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var formUtils: FormUtils
 
@@ -53,6 +59,7 @@ class RequestActivity : AppCompatActivity() {
 
     // Preview Components
     private lateinit var previewCard: CardView
+    private lateinit var cardBackground: View
     private lateinit var valueLoanAmount: TextView
     private lateinit var valueAdminFee: TextView
     private lateinit var valueInterestRate: TextView
@@ -60,6 +67,9 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var valueAmountReceived: TextView
     private lateinit var valueMonthlyInstallment: TextView
     private lateinit var valueTotalPayment: TextView
+    private lateinit var availablePlafond: TextView
+
+    private lateinit var customerDetails: CustomerDetailModel
 
     private val LOCATION_PERMISSION_CODE = 1001
     private var currentLat: Double? = null
@@ -68,12 +78,12 @@ class RequestActivity : AppCompatActivity() {
     private var submitButtonEnabled = true
 
     // Loan calculation constants
-    companion object {
-        private const val ADMIN_FEE_PERCENTAGE = 0.05 // 5%
-        private const val INTEREST_RATE_6_MONTHS = 0.02 // 2% per month
-        private const val INTEREST_RATE_12_MONTHS = 0.018 // 1.8% per month
-        private const val INTEREST_RATE_24_MONTHS = 0.015 // 1.5% per month
-    }
+//    companion object {
+//        private const val ADMIN_FEE_PERCENTAGE = 0.05 // 5%
+//        private const val INTEREST_RATE_6_MONTHS = 0.02 // 2% per month
+//        private const val INTEREST_RATE_12_MONTHS = 0.018 // 1.8% per month
+//        private const val INTEREST_RATE_24_MONTHS = 0.015 // 1.5% per month
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +106,7 @@ class RequestActivity : AppCompatActivity() {
         formUtils = FormUtils()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Main UI Components
+        availablePlafond = findViewById(R.id.tv_available_plafond)
         locationTextView = findViewById(R.id.location_value)
         locationErrorTextView = findViewById(R.id.location_error)
         amountInput = findViewById(R.id.amount_input)
@@ -112,6 +123,7 @@ class RequestActivity : AppCompatActivity() {
 
         // Preview Components
         previewCard = findViewById(R.id.preview_card)
+        cardBackground = findViewById(R.id.card_background)
         valueLoanAmount = findViewById(R.id.value_loan_amount)
         valueAdminFee = findViewById(R.id.value_admin_fee)
         valueInterestRate = findViewById(R.id.value_interest_rate)
@@ -123,7 +135,28 @@ class RequestActivity : AppCompatActivity() {
         setRadioButtonColor(R.id.tenor_6)
         setRadioButtonColor(R.id.tenor_12)
         setRadioButtonColor(R.id.tenor_24)
+        customerDetails = intent.getParcelableExtra<CustomerDetailModel>("customer")!!
+        availablePlafond.setText(customerDetails?.availablePlafond ?: "Rp 0")
+        setupCardBackground(customerDetails)
         formUtils.clearErrorOnInput(amountInputLayout, amountInput)
+    }
+
+    private fun setupCardBackground(customer: CustomerDetailModel?) {
+        try {
+            val colors = intArrayOf(
+                Color.parseColor(customer?.plafond?.colorStart),
+                Color.parseColor(customer?.plafond?.colorEnd)
+            )
+            val gradientDrawable = GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                colors
+            ).apply {
+                cornerRadius = 32f
+            }
+            cardBackground.background = gradientDrawable
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     private fun observeViewModel() {
@@ -299,19 +332,12 @@ class RequestActivity : AppCompatActivity() {
         }
     }
 
-    private fun getInterestRate(tenor: Int): Double {
-        return when (tenor) {
-            6 -> INTEREST_RATE_6_MONTHS
-            12 -> INTEREST_RATE_12_MONTHS
-            24 -> INTEREST_RATE_24_MONTHS
-            else -> 0.0
-        }
-    }
-
     private fun calculateAndDisplayLoan(loanAmount: Long, tenor: Int) {
-        val adminFee = (loanAmount * ADMIN_FEE_PERCENTAGE).toLong()
+        val adminRate = customerDetails.plafond?.adminRate
+        val finalAdminRate = if (adminRate == null || adminRate == 0.0) 0.025 else adminRate
+        val adminFee = (loanAmount * finalAdminRate).toLong()
         val amountReceived = loanAmount - adminFee
-        val monthlyInterestRate = getInterestRate(tenor)
+        val monthlyInterestRate = (customerDetails.plafond?.annualRate ?: 0.0) / 12
         val totalInterest = (loanAmount * monthlyInterestRate * tenor).toLong()
         val totalPayment = loanAmount + totalInterest
         val monthlyInstallment = totalPayment / tenor
