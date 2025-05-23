@@ -336,10 +336,10 @@ class RequestActivity : AppCompatActivity() {
         val adminRate = customerDetails.plafond?.adminRate
         val finalAdminRate = if (adminRate == null || adminRate == 0.0) 0.025 else adminRate
         val adminFee = (loanAmount * finalAdminRate).toLong()
-        val amountReceived = loanAmount - adminFee
+        val amountReceived = loanAmount
         val monthlyInterestRate = (customerDetails.plafond?.annualRate ?: 0.0) / 12
         val totalInterest = (loanAmount * monthlyInterestRate * tenor).toLong()
-        val totalPayment = loanAmount + totalInterest
+        val totalPayment = loanAmount + totalInterest + adminFee
         val monthlyInstallment = totalPayment / tenor
 
         // Update preview values
