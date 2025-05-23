@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 //    private const val BASE_URL = "http://localhost:8080/api/v1/"
-    private const val BASE_URL = "http://34.60.203.63/api/v1/"
-//    private const val BASE_URL = "https://cef4-114-10-73-50.ngrok-free.app/api/v1/"
+//    private const val BASE_URL = "http://34.60.203.63/api/v1/"
+    private const val BASE_URL = "https://7dea-114-10-119-149.ngrok-free.app/api/v1/"
 
     private var tokenProvider: (() -> String?)? = null
 

@@ -326,7 +326,7 @@ class HomeFragment() : Fragment() {
                 amount = customer.plafond?.amount ?: "Rp0",
                 title = "Peminjaman #1",
                 date = "20 Mei 2025",
-                status = "Disetujui",
+                status = "APPROVED",
                 tenor = "12",
                 isApproved = true
             ),
@@ -335,7 +335,7 @@ class HomeFragment() : Fragment() {
                 amount = customer.plafond?.amount ?: "Rp0",
                 title = "Peminjaman #1",
                 date = "20 Mei 2025",
-                status = "Disetujui",
+                status = "REJECTED",
                 tenor = "12",
                 isApproved = true
             )

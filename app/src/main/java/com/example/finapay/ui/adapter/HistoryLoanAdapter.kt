@@ -27,10 +27,10 @@ class HistoryLoanAdapter(private var items: MutableList<LoanModel>) :
         val item = items[position]
         holder.amount.text = item.amount
         holder.tenor.text = item.tenor
-        if (item.isApproved == true) {
+        if (item.status == "APPROVED") {
             holder.status.text = "Disetujui"
             holder.status.setBackgroundResource(R.drawable.status_bg_active)
-        } else {
+        } else if (item.status == "REJECTED") {
             holder.status.text = "Ditolak"
             holder.status.setBackgroundResource(R.drawable.color_button_red)
         }

@@ -1,6 +1,7 @@
 package com.example.finapay.ui.history
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,6 +79,8 @@ class LoanStatusFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rv_loan_history)
         swipeRefresh = view.findViewById(R.id.swipe_refresh)
         emptyText = view.findViewById(R.id.tv_empty_data)
+
+        swipeRefresh.isRefreshing = true
     }
 
     private fun setupRecyclerView() {
@@ -96,8 +99,8 @@ class LoanStatusFragment : Fragment() {
         viewModel.loanHistory.observe(viewLifecycleOwner) { allLoans ->
             val filteredLoans = allLoans.filter { loan ->
                 when (loanStatus) {
-                    LoanStatus.APPROVED -> loan.isApproved
-                    LoanStatus.REJECTED -> !loan.isApproved
+                    LoanStatus.APPROVED -> loan.status == "APPROVED"
+                    LoanStatus.REJECTED -> loan.status == "REJECTED"
                 }
             }
 
