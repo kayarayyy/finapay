@@ -32,9 +32,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
 import java.util.Locale
 
+@AndroidEntryPoint
 class RequestActivity : AppCompatActivity() {
 
     private val viewModel: RequestViewModel by viewModels()

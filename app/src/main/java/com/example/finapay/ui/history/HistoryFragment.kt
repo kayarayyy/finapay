@@ -20,7 +20,9 @@ import com.example.finapay.ui.adapter.HistoryLoanAdapter
 import com.example.finapay.ui.adapter.HistoryPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HistoryFragment : Fragment() {
 
     private lateinit var viewModel: HistoryViewModel

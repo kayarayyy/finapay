@@ -18,6 +18,7 @@ import com.example.finapay.data.repositories.CustomerDetailsRepository
 import com.example.finapay.ui.request.RequestViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -26,9 +27,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
-class MyAccountViewModel : ViewModel() {
-    private val repository = CustomerDetailsRepository()
+@HiltViewModel
+class MyAccountViewModel @Inject constructor(
+    private val customerDetailsRepository: CustomerDetailsRepository
+) : ViewModel() {
 
     private val _customerDetails = MutableLiveData<CustomerDetailModel>()
     val customerDetails: LiveData<CustomerDetailModel> = _customerDetails
@@ -98,7 +102,7 @@ class MyAccountViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                repository.createCustomerDetails(
+                customerDetailsRepository.createCustomerDetails(
                     customerDetail.street!!.toRequestBody(),
                     customerDetail.district!!.toRequestBody(),
                     customerDetail.province!!.toRequestBody(),

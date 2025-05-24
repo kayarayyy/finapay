@@ -41,10 +41,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.example.finapay.utils.FormUtils
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+@AndroidEntryPoint
 class MyAccountActivity : AppCompatActivity() {
     private var submitButtonIsEnabled: Boolean = true
 

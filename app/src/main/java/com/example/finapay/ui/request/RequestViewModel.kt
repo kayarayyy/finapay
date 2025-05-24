@@ -12,6 +12,7 @@ import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.LoanRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -21,11 +22,12 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class RequestViewModel : ViewModel() {
-
-    private val repository = LoanRepository()
-
+@HiltViewModel
+class RequestViewModel @Inject constructor(
+    private val loanRepository: LoanRepository
+) : ViewModel() {
     private val _uploadResult = MutableLiveData<ApiResponse<LoanModel>>()
     val uploadResult: LiveData<ApiResponse<LoanModel>> = _uploadResult
 
@@ -57,7 +59,7 @@ class RequestViewModel : ViewModel() {
                 // Add artificial delay to show loading state (remove in production)
                 delay(1000)
 
-                repository.postLoanRequest(refferalStr.toRequestBody(), amountCleaned.toRequestBody(), tenor.toRequestBody(), latitude.toRequestBody(), longitude.toRequestBody())
+                loanRepository.postLoanRequest(refferalStr.toRequestBody(), amountCleaned.toRequestBody(), tenor.toRequestBody(), latitude.toRequestBody(), longitude.toRequestBody())
                     .enqueue(object : Callback<ApiResponse<LoanModel>> {
                         override fun onResponse(
                             call: Call<ApiResponse<LoanModel>>,

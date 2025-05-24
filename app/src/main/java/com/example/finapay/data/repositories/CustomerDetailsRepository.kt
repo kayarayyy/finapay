@@ -2,14 +2,17 @@ package com.example.finapay.data.repositories
 
 import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.data.models.response.ApiResponse
-import com.example.finapay.data.sources.ApiClient
+import com.example.finapay.data.sources.remote.CustomerDetailsService
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
+import javax.inject.Inject
 
-class CustomerDetailsRepository {
+class CustomerDetailsRepository @Inject constructor(
+    private val apiService: CustomerDetailsService // misalnya
+){
     fun getCustomerDetailByEmail(): Call<ApiResponse<CustomerDetailModel>> {
-        return ApiClient.customerDetailsService.getCustomerDetailByEmail()
+        return apiService.getCustomerDetailByEmail()
     }
 
     fun createCustomerDetails(
@@ -32,7 +35,7 @@ class CustomerDetailsRepository {
         house: MultipartBody.Part,
         ktp: MultipartBody.Part
     ): Call<ApiResponse<CustomerDetailModel>> {
-        return ApiClient.customerDetailsService.createCustomerDetail(
+        return apiService.createCustomerDetail(
             street,
             district,
             province,

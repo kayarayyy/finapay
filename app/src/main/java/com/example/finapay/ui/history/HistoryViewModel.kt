@@ -12,16 +12,19 @@ import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.LoanRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
+import javax.inject.Inject
 
-class HistoryViewModel : ViewModel() {
-
-    private val repository = LoanRepository()
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
+    private val loanRepository: LoanRepository
+) : ViewModel() {
 
     private val _loanHistory = MutableLiveData<List<LoanModel>>()
     val loanHistory: LiveData<List<LoanModel>> = _loanHistory
@@ -37,7 +40,7 @@ class HistoryViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = repository.getAllLoanRequestByEmail()
+                val response = loanRepository.getAllLoanRequestByEmail()
                 if (response.status == "success" && response.data != null) {
                     _loanHistory.postValue(response.data)
                 } else {

@@ -2,22 +2,24 @@ package com.example.finapay.data.repositories
 
 import com.example.finapay.data.models.LoanModel
 import com.example.finapay.data.models.response.ApiResponse
-import com.example.finapay.data.sources.ApiClient
-import okhttp3.MultipartBody
+import com.example.finapay.data.sources.remote.LoanService
 import okhttp3.RequestBody
 import retrofit2.Call
+import javax.inject.Inject
 
-class LoanRepository {
+class LoanRepository @Inject constructor(
+    private val loanService: LoanService
+) {
     fun getLoanRequestOnGoing(): Call<ApiResponse<List<LoanModel>>> {
-        return ApiClient.loanService.getLoanRequestOnGoing()
+        return loanService.getLoanRequestOnGoing()
     }
 
     suspend fun getAllLoanRequestByEmail(): ApiResponse<List<LoanModel>> {
-        return ApiClient.loanService.getAllLoanRequestByEmail()
+        return loanService.getAllLoanRequestByEmail()
     }
 
     suspend fun getAllLoanRequestByEmailAndStatus(status: String? = null): ApiResponse<List<LoanModel>> {
-        return ApiClient.loanService.getAllLoanRequestByEmailAndStatus(status)
+        return loanService.getAllLoanRequestByEmail(status)
     }
 
     fun postLoanRequest(
@@ -27,6 +29,6 @@ class LoanRepository {
         latitude: RequestBody,
         longitude: RequestBody
     ): Call<ApiResponse<LoanModel>> {
-        return ApiClient.loanService.uploadKtpImage(refferal, amount, tenor, latitude, longitude)
+        return loanService.postLoanRequest(refferal, amount, tenor, latitude, longitude)
     }
 }

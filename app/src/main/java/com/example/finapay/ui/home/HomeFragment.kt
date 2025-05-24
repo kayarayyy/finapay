@@ -1,6 +1,5 @@
 package com.example.finapay.ui.home
 
-import android.app.Application
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -8,13 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -26,16 +20,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.finapay.R
 import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.data.models.LoanModel
-import com.example.finapay.data.models.PaymentModel
 import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
 import com.example.finapay.ui.my_account.MyAccountActivity
 import com.example.finapay.ui.request.RequestActivity
-import com.example.finapay.ui.simulation.SimulationActivity
 import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.SharedPreferencesHelper
 import com.facebook.shimmer.ShimmerFrameLayout
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment() : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
