@@ -116,6 +116,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/tv_due_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"

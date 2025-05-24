@@ -75,33 +75,27 @@ class HomeFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupStatusBar()
-        initComponents()
-        initViews(view)
-        setupRecyclerViews()
-        setupListeners()
-        observeViewModel()
-
-        // Initial data load
-        viewModel.getCustomerDetails()
-    }
-
-    private fun setupStatusBar() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             val controller =
                 WindowCompat.getInsetsController(requireActivity().window, requireView())
             controller?.show(WindowInsetsCompat.Type.statusBars())
         }
+
+        initViews(view)
+        setupRecyclerViews()
+        setupListeners()
+        observeViewModel()
+
+        viewModel.getCustomerDetails()
+        viewModel.getLoanHistory("approved")
     }
 
-    private fun initComponents() {
+    private fun initViews(view: View) {
         sharedPreferencesHelper = SharedPreferencesHelper(requireContext())
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         adapterActiveLoan = ActiveLoanAdapter(mutableListOf())
         adapterPayment = PaymentAdapter(mutableListOf())
-    }
 
-    private fun initViews(view: View) {
         // Swipe Refresh Layout
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
 
@@ -170,6 +164,7 @@ class HomeFragment() : Fragment() {
             hideDataViews()
             onInternet = true
             viewModel.getCustomerDetails()
+            viewModel.getLoanHistory("approved")
         }
 
         // Simulation Button Listener
@@ -187,18 +182,34 @@ class HomeFragment() : Fragment() {
 
         // Request Button Listener
         ivRequest.setOnClickListener {
-            handleRequestButtonClick()
+            if (onInternet == true) {
+                if (canRequest == false) {
+                    showDataIncompleteDialog()
+                } else {
+                    navigateToRequestActivity()
+                }
+            } else {
+                showFeatureNotAvailableDialog("ajukan")
+            }
         }
     }
 
     private fun observeViewModel() {
+        viewModel.loanHistorySuccess.observe(viewLifecycleOwner) { loans ->
+            stopShimmerActiveLoan()
+
+            updateActiveLoanData(loans)
+            updatePaymentData(loans)
+        }
+        viewModel.loanHistoryError.observe(viewLifecycleOwner) { error ->
+            stopShimmerActiveLoan()
+        }
+
         // Success Observer
         viewModel.customerDetailsSuccess.observe(viewLifecycleOwner) { customer ->
             swipeRefreshLayout.isRefreshing = false
 
             setupCardBackground(customer)
-            updateActiveLoanData(customer)
-            updatePaymentData()
             updateUserInfo(customer)
 
             stopShimmerAnimation()
@@ -248,9 +259,18 @@ class HomeFragment() : Fragment() {
             shimmerTotal,
             shimmerUsed,
             shimmerAvailable,
-            shimmerActiveLoan,
-            shimmerNextPayment,
             shimmerName
+        )
+            .forEach { shimmer ->
+                shimmer.stopShimmer()
+                shimmer.visibility = View.GONE
+            }
+    }
+
+    private fun stopShimmerActiveLoan() {
+        listOf(
+            shimmerActiveLoan,
+            shimmerNextPayment
         )
             .forEach { shimmer ->
                 shimmer.stopShimmer()
@@ -293,13 +313,11 @@ class HomeFragment() : Fragment() {
         }
     }
 
-    private fun updateActiveLoanData(customer: CustomerDetailModel) {
-        val loanModel = createMockLoanData(customer)
+    private fun updateActiveLoanData(loanModel: List<LoanModel>) {
         adapterActiveLoan.updateData(loanModel)
     }
 
-    private fun updatePaymentData() {
-        val paymentModel = createMockPaymentData()
+    private fun updatePaymentData(paymentModel: List<LoanModel>) {
         adapterPayment.updateData(paymentModel)
     }
 
@@ -319,42 +337,6 @@ class HomeFragment() : Fragment() {
         tvUserName.setText(user?.name ?: "-")
     }
 
-    private fun createMockLoanData(customer: CustomerDetailModel): List<LoanModel> {
-        return listOf(
-            LoanModel(
-                id = "1",
-                amount = customer.plafond?.amount ?: "Rp0",
-                title = "Peminjaman #1",
-                date = "20 Mei 2025",
-                status = "APPROVED",
-                tenor = "12",
-                isApproved = true
-            ),
-            LoanModel(
-                id = "2",
-                amount = customer.plafond?.amount ?: "Rp0",
-                title = "Peminjaman #1",
-                date = "20 Mei 2025",
-                status = "REJECTED",
-                tenor = "12",
-                isApproved = true
-            )
-        )
-    }
-
-    private fun createMockPaymentData(): List<PaymentModel> {
-        return listOf(
-            PaymentModel(
-                amount = "Rp200.000",
-                dueDate = "13 Maret 2025"
-            ),
-            PaymentModel(
-                amount = "Rp350.000",
-                dueDate = "21 Maret 2025"
-            )
-        )
-    }
-
     private fun showFeatureNotAvailableDialog(name: String) {
         CustomDialog.show(
             context = requireContext(),
@@ -365,18 +347,6 @@ class HomeFragment() : Fragment() {
             primaryButtonBackgroundRes = R.drawable.color_button_blue,
             iconColor = R.color.red,
         )
-    }
-
-    private fun handleRequestButtonClick() {
-        if (onInternet == true) {
-            if (canRequest == false) {
-                showDataIncompleteDialog()
-            } else {
-                navigateToRequestActivity()
-            }
-        } else {
-            showFeatureNotAvailableDialog("ajukan")
-        }
     }
 
     private fun navigateToRequestActivity() {

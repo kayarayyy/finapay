@@ -372,14 +372,14 @@ class RequestActivity : AppCompatActivity() {
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             showLocationLoading(false)
-            if (location != null) {
+//            if (location != null) {
                 currentLat = location.latitude
                 currentLon = location.longitude
                 updateLocationDisplay(location.latitude, location.longitude)
                 hideLocationError()
-            } else {
-                showLocationError("Tidak dapat mendapatkan lokasi. Pastikan GPS aktif.")
-            }
+//            } else {
+//                showLocationError("Tidak dapat mendapatkan lokasi. Pastikan GPS aktif.")
+//            }
         }.addOnFailureListener {
             showLocationLoading(false)
             showLocationError("Gagal mendapatkan lokasi: ${it.message}")

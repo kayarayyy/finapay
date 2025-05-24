@@ -16,6 +16,10 @@ class LoanRepository {
         return ApiClient.loanService.getAllLoanRequestByEmail()
     }
 
+    suspend fun getAllLoanRequestByEmailAndStatus(status: String? = null): ApiResponse<List<LoanModel>> {
+        return ApiClient.loanService.getAllLoanRequestByEmailAndStatus(status)
+    }
+
     fun postLoanRequest(
         refferal: RequestBody,
         amount: RequestBody,

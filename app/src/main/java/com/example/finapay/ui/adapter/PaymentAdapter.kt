@@ -7,9 +7,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finapay.R
-import com.example.finapay.data.models.PaymentModel
+import com.example.finapay.data.models.LoanModel
 
-class PaymentAdapter(private var items: MutableList<PaymentModel>) :
+class PaymentAdapter(private var items: MutableList<LoanModel>) :
     RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>() {
 
     inner  class PaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,12 +26,12 @@ class PaymentAdapter(private var items: MutableList<PaymentModel>) :
 
     override fun onBindViewHolder(holder: PaymentViewHolder, position: Int) {
         val item = items[position]
-        holder.amount.text = item.amount
-        holder.dueDate.text = item.dueDate
+        holder.amount.text = item.instalment
+        holder.dueDate.text = item.backOfficeDisbursedAt
         holder.payNow.backgroundTintList = null
     }
 
-    fun updateData(newItems: List<PaymentModel>) {
+    fun updateData(newItems: List<LoanModel>) {
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
