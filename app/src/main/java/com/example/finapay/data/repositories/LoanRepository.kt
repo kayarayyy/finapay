@@ -10,9 +10,6 @@ import javax.inject.Inject
 class LoanRepository @Inject constructor(
     private val loanService: LoanService
 ) {
-    fun getLoanRequestOnGoing(): Call<ApiResponse<List<LoanModel>>> {
-        return loanService.getLoanRequestOnGoing()
-    }
 
     suspend fun getAllLoanRequestByEmail(): ApiResponse<List<LoanModel>> {
         return loanService.getAllLoanRequestByEmail()
