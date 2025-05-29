@@ -221,12 +221,13 @@ class RegisterActivity : AppCompatActivity() {
                     message = "Akun kamu sudah terdaftar. Silakan cek email untuk otentikasi.",
                     primaryButtonText = "Kembali Login",
                     primaryButtonBackgroundRes = R.drawable.color_button_blue,
-                    iconColor = R.color.blue
-                ) {
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                }
+                    iconColor = R.color.blue,
+                    onPrimaryClick = {
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                    }
+                )
 
             }
         }

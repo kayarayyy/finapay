@@ -326,10 +326,12 @@
 
             <!-- Next Payment -->
             <TextView
+                android:id="@+id/tv_next_payment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
+                android:visibility="gone"
                 android:text="Pembayaran Berikutnya"
                 android:textColor="#333333"
                 android:textSize="18sp"
@@ -359,6 +361,8 @@
 
             <!-- Current Loans -->
             <TextView
+                android:id="@+id/tv_active_loan"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"

@@ -49,6 +49,8 @@ class HomeFragment() : Fragment() {
     private lateinit var tvTotalPlafond: TextView
     private lateinit var tvUsedPlafond: TextView
     private lateinit var tvAvailablePlafond: TextView
+    private lateinit var tvActiveLoan: TextView
+    private lateinit var tvNextPayment: TextView
     private lateinit var ivSimulation: ImageView
     private lateinit var ivHistory: ImageView
     private lateinit var ivBill: ImageView
@@ -106,6 +108,8 @@ class HomeFragment() : Fragment() {
         tvTotalPlafond = view.findViewById(R.id.tv_total_plafond)
         tvUsedPlafond = view.findViewById(R.id.tv_used_plafond)
         tvAvailablePlafond = view.findViewById(R.id.tv_available_plafond)
+        tvActiveLoan = view.findViewById(R.id.tv_active_loan)
+        tvNextPayment = view.findViewById(R.id.tv_next_payment)
 
         // Image Views (Clickable buttons)
         ivSimulation = view.findViewById(R.id.iv_simulation)
@@ -194,9 +198,15 @@ class HomeFragment() : Fragment() {
 
             updateActiveLoanData(loans)
             updatePaymentData(loans)
+            if (loans.size >= 1 ) {
+                tvActiveLoan.visibility = View.VISIBLE
+                tvNextPayment.visibility = View.VISIBLE
+            }
         }
         viewModel.loanHistoryError.observe(viewLifecycleOwner) { error ->
             stopShimmerActiveLoan()
+            tvActiveLoan.visibility = View.GONE
+            tvNextPayment.visibility = View.GONE
         }
 
         // Success Observer
@@ -221,6 +231,8 @@ class HomeFragment() : Fragment() {
             showDataViews()
             canRequest = false
             onInternet = true
+            tvActiveLoan.visibility = View.GONE
+            tvNextPayment.visibility = View.GONE
         }
 
         viewModel.internetErrorError.observe(viewLifecycleOwner) { error ->
@@ -230,6 +242,8 @@ class HomeFragment() : Fragment() {
             showDataViews()
             canRequest = false
             onInternet = false
+            tvActiveLoan.visibility = View.GONE
+            tvNextPayment.visibility = View.GONE
         }
     }
 

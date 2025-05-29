@@ -174,7 +174,7 @@ class MyAccountActivity : AppCompatActivity() {
                 context = this,
                 iconRes = R.drawable.ic_baseline_add_task_24,
                 title = "Sukses!",
-                message = "Data anda akan di review",
+                message = "Sekarang anda dapat melakukan pengajuan pinjaman",
                 primaryButtonText = "OK",
                 primaryButtonBackgroundRes = R.drawable.color_button_blue,
                 onPrimaryClick = {
