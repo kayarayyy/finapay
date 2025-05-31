@@ -52,7 +52,6 @@ class SimulationActivity : AppCompatActivity() {
         // Error handling untuk kegagalan memuat data
         viewModel.plafondsError.observe(this) { error ->
             if (!error.isNullOrBlank()) {
-                Toast.makeText(this, "Gagal memuat data: $error", Toast.LENGTH_LONG).show()
                 shimmerLayout.startShimmer()
                 shimmerLayout.visibility = View.VISIBLE
                 recyclerView.visibility = View.GONE

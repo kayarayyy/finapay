@@ -90,19 +90,6 @@ class ProfileFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun navigateToHelp() {
-        // Uncomment when HelpActivity is created
-        // val intent = Intent(requireContext(), HelpActivity::class.java)
-        // startActivity(intent)
-        Toast.makeText(requireContext(), "Bantuan diklik", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun navigateToAbout() {
-        // Uncomment when AboutActivity is created
-        // val intent = Intent(requireContext(), AboutActivity::class.java)
-        // startActivity(intent)
-        Toast.makeText(requireContext(), "Tentang Aplikasi diklik", Toast.LENGTH_SHORT).show()
-    }
 
     private fun logout() {
         val sharedPrefHelper = SharedPreferencesHelper(requireContext())

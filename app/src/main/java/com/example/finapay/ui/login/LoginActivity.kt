@@ -85,17 +85,11 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     enableView()
                     loginProgress.visibility = View.GONE
-                    Toast.makeText(this, "Token ID tidak tersedia", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: ApiException) {
                 enableView()
                 loginProgress.visibility = View.GONE
                 Log.e("GoogleLogin", "Login gagal, code=${e.statusCode}", e)
-                Toast.makeText(
-                    this,
-                    "Login Google gagal: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         } else {
             enableView()

@@ -192,8 +192,6 @@ class MyAccountActivity : AppCompatActivity() {
                 iconColor = R.color.blue
             )
             disableView()
-            // TODO: tampilkan data pelanggan
-            Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
         }
 
         homeViewModel.customerDetailsSuccess.observe(this) { customerDetails ->
