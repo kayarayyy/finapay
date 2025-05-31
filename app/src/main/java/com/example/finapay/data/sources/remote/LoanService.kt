@@ -26,6 +26,7 @@ interface LoanService {
         @Part("amount") amount: RequestBody,
         @Part("tenor") tenor: RequestBody,
         @Part("latitude") latitude: RequestBody,
-        @Part("longitude") longitude: RequestBody
+        @Part("longitude") longitude: RequestBody,
+        @Part("purpose") purpose: RequestBody
     ): Call<ApiResponse<LoanModel>>
 }

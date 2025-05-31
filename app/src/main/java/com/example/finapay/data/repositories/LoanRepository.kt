@@ -24,8 +24,9 @@ class LoanRepository @Inject constructor(
         amount: RequestBody,
         tenor: RequestBody,
         latitude: RequestBody,
-        longitude: RequestBody
+        longitude: RequestBody,
+        purpose: RequestBody
     ): Call<ApiResponse<LoanModel>> {
-        return loanService.postLoanRequest(refferal, amount, tenor, latitude, longitude)
+        return loanService.postLoanRequest(refferal, amount, tenor, latitude, longitude, purpose)
     }
 }

@@ -286,6 +286,29 @@
                         android:layout_marginStart="24dp" />
                 </RadioGroup>
 
+                <!-- Input Purpose -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/purpose_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tujuan Penggunaan Dana"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/gray"
+                    app:hintTextColor="@color/black"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:layout_constraintTop_toBottomOf="@id/tenor_group"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/purpose_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textColor="@color/black"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 

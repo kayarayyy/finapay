@@ -42,7 +42,8 @@ class RequestViewModel @Inject constructor(
         amount: String,
         tenor: String,
         latitude: String,
-        longitude: String
+        longitude: String,
+        purpose: String
     ) {
         _isLoading.postValue(true)
 
@@ -59,7 +60,7 @@ class RequestViewModel @Inject constructor(
                 // Add artificial delay to show loading state (remove in production)
                 delay(1000)
 
-                loanRepository.postLoanRequest(refferalStr.toRequestBody(), amountCleaned.toRequestBody(), tenor.toRequestBody(), latitude.toRequestBody(), longitude.toRequestBody())
+                loanRepository.postLoanRequest(refferalStr.toRequestBody(), amountCleaned.toRequestBody(), tenor.toRequestBody(), latitude.toRequestBody(), longitude.toRequestBody(), purpose.toRequestBody())
                     .enqueue(object : Callback<ApiResponse<LoanModel>> {
                         override fun onResponse(
                             call: Call<ApiResponse<LoanModel>>,

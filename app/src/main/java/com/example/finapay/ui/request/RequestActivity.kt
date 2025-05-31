@@ -50,8 +50,10 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var locationErrorTextView: TextView
     private lateinit var amountInput: TextInputEditText
     private lateinit var refferalInput: TextInputEditText
+    private lateinit var purposeInput: TextInputEditText
     private lateinit var amountInputLayout: TextInputLayout
     private lateinit var refferalInputLayout: TextInputLayout
+    private lateinit var purposeInputLayout: TextInputLayout
     private lateinit var tenorRadioGroup: RadioGroup
     private lateinit var tenor6: RadioButton
     private lateinit var tenor12: RadioButton
@@ -107,8 +109,10 @@ class RequestActivity : AppCompatActivity() {
         locationErrorTextView = findViewById(R.id.location_error)
         amountInput = findViewById(R.id.amount_input)
         refferalInput = findViewById(R.id.referral_input)
+        purposeInput = findViewById(R.id.purpose_input)
         amountInputLayout = findViewById(R.id.amount_layout)
         refferalInputLayout = findViewById(R.id.referral_layout)
+        purposeInputLayout = findViewById(R.id.purpose_layout)
         tenorRadioGroup = findViewById(R.id.tenor_group)
         tenor6 = findViewById(R.id.tenor_6)
         tenor12 = findViewById(R.id.tenor_12)
@@ -136,6 +140,7 @@ class RequestActivity : AppCompatActivity() {
         availablePlafond.setText(customerDetails?.availablePlafond ?: "Rp 0")
         setupCardBackground(customerDetails)
         formUtils.clearErrorOnInput(amountInputLayout, amountInput)
+        formUtils.clearErrorOnInput(purposeInputLayout, purposeInput)
     }
 
     private fun setupCardBackground(customer: CustomerDetailModel?) {
@@ -204,6 +209,7 @@ class RequestActivity : AppCompatActivity() {
     private fun disableView() {
         refferalInput.isEnabled = false
         amountInput.isEnabled = false
+        purposeInput.isEnabled = false
         tenorRadioGroup.isEnabled = false
         tenor6.isEnabled = false
         tenor12.isEnabled = false
@@ -215,6 +221,7 @@ class RequestActivity : AppCompatActivity() {
     private fun enableView() {
         refferalInput.isEnabled = true
         amountInput.isEnabled = true
+        purposeInput.isEnabled = true
         tenorRadioGroup.isEnabled = true
         tenor6.isEnabled = true
         tenor12.isEnabled = true
@@ -429,6 +436,7 @@ class RequestActivity : AppCompatActivity() {
         }
 
         validateEditText(amountInputLayout, amountInput, "Jumlah pinjaman wajib diisi")
+        validateEditText(purposeInputLayout, purposeInput, "Tujuan penggunaan dana wajib diisi")
 
         if (tenorRadioGroup.checkedRadioButtonId == -1) {
             isValid = false
@@ -452,6 +460,7 @@ class RequestActivity : AppCompatActivity() {
     private fun submitLoanRequest() {
         val referral = refferalInput.text.toString()
         val amount = amountInput.text.toString()
+        val purpose = purposeInput.text.toString()
         val tenor = getSelectedTenor().toString()
         val latitude = currentLat.toString()
         val longitude = currentLon.toString()
@@ -466,7 +475,7 @@ class RequestActivity : AppCompatActivity() {
             secondaryButtonText = "Batal",
             secondaryButtonBackgroundRes = R.drawable.color_button_gray,
             onPrimaryClick = {
-                viewModel.uploadPengajuan(referral, amount, tenor, latitude, longitude)
+                viewModel.uploadPengajuan(referral, amount, tenor, latitude, longitude, purpose)
             },
             iconColor = R.color.blue,
         )
