@@ -220,7 +220,7 @@ class HomeFragment() : Fragment() {
                     navigateToRequestActivity()
                 }
             } else {
-                showFeatureNotAvailableDialog("ajukan")
+                showFeatureOffline("Ajukan")
             }
         }
     }
@@ -441,6 +441,18 @@ class HomeFragment() : Fragment() {
             tvAvailablePlafond.setText("Rp -")
         }
         tvUserName.setText(user?.name ?: "-")
+    }
+
+    private fun showFeatureOffline(name: String) {
+        CustomDialog.show(
+            context = requireContext(),
+            iconRes = R.drawable.ic_baseline_error_outline_24,
+            title = "Offline",
+            message = "Saat ini anda sedang Offline, fitur ${name} pinjaman belum tersedia. Silakan coba lagi nanti.",
+            primaryButtonText = "Oke",
+            primaryButtonBackgroundRes = R.drawable.color_button_blue,
+            iconColor = R.color.red,
+        )
     }
 
     private fun showFeatureNotAvailableDialog(name: String) {
