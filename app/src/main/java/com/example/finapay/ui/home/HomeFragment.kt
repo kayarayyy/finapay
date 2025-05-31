@@ -279,9 +279,14 @@ class HomeFragment() : Fragment() {
         landingViewModel.plafondsError.observe(viewLifecycleOwner) { error ->
             if (!error.isNullOrBlank()) {
                 val cachedPlafonds: List<PlafondModel> = sharedPreferencesHelper.getPlafondList()
-                adapterPlafond.updateData(cachedPlafonds)
-                rvPlafond.visibility = View.VISIBLE
-                tvListPlafond.visibility = View.VISIBLE
+                if (cachedPlafonds.isEmpty()){
+                    rvPlafond.visibility = View.GONE
+                    tvListPlafond.visibility = View.GONE
+                } else {
+                    adapterPlafond.updateData(cachedPlafonds)
+                    rvPlafond.visibility = View.VISIBLE
+                    tvListPlafond.visibility = View.VISIBLE
+                }
             }
         }
 

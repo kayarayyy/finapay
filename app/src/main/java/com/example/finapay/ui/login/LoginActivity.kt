@@ -85,21 +85,48 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     enableView()
                     loginProgress.visibility = View.GONE
-//                    Toast.makeText(this, "Token ID tidak tersedia", Toast.LENGTH_SHORT).show()
+                    CustomDialog.show(
+                        context = this,
+                        iconRes = R.drawable.ic_outline_cancel_presentation_24,
+                        title = "Login Gagal!",
+                        message = "Terjadi kesalahan saat login. Gagal mendapatkan token.",
+                        primaryButtonText = "OK",
+                        primaryButtonBackgroundRes = R.drawable.color_button_red,
+                        iconColor = R.color.red
+                    )
+                    Toast.makeText(this, "Token ID tidak tersedia", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: ApiException) {
                 enableView()
                 loginProgress.visibility = View.GONE
+                CustomDialog.show(
+                    context = this,
+                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
+                    title = "Login Gagal!",
+                    message = "Terjadi kesalahan saat login. Aplikasi tidak diizinkan.",
+                    primaryButtonText = "OK",
+                    primaryButtonBackgroundRes = R.drawable.color_button_red,
+                    iconColor = R.color.red
+                )
                 Log.e("GoogleLogin", "Login gagal, code=${e.statusCode}", e)
-//                Toast.makeText(
-//                    this,
-//                    "Login Google gagal: ${e.localizedMessage}",
-//                    Toast.LENGTH_SHORT
-//                ).show()
+                Toast.makeText(
+                    this,
+                    "Login Google gagal: ${e.localizedMessage}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         } else {
             enableView()
             loginProgress.visibility = View.GONE
+            CustomDialog.show(
+                context = this,
+                iconRes = R.drawable.ic_outline_cancel_presentation_24,
+                title = "Login Gagal!",
+                message = "Terjadi kesalahan saat login. Sign in dibatalkan.",
+                primaryButtonText = "OK",
+                primaryButtonBackgroundRes = R.drawable.color_button_red,
+                iconColor = R.color.red
+            )
 
             Log.e("GoogleLogin", "Login dibatalkan oleh pengguna.")
         }
@@ -164,7 +191,7 @@ class LoginActivity : AppCompatActivity() {
         registerButtonIsEnabled = false
     }
 
-    private fun enableView(){
+    private fun enableView() {
         loginGoogleButton.isEnabled = true
         emailInput.isEnabled = true
         passwordInput.isEnabled = true
@@ -179,7 +206,12 @@ class LoginActivity : AppCompatActivity() {
         var isValid = true
         var firstInvalidView: View? = null
 
-        fun validateEditText(layout: TextInputLayout, input: TextInputEditText, fieldName: String, isEmail: Boolean = false) {
+        fun validateEditText(
+            layout: TextInputLayout,
+            input: TextInputEditText,
+            fieldName: String,
+            isEmail: Boolean = false
+        ) {
             val text = input.text?.toString()?.trim()
             if (text.isNullOrEmpty()) {
                 layout.error = "$fieldName wajib diisi"

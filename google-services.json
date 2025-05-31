@@ -22,6 +22,22 @@
           }
         },
         {
+          "client_id": "630482567435-mdi4biq1cfftf4loc6tl3utejdei2ua2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.finapay",
+            "certificate_hash": "e27052a7a8631c54e8728639b484567b29c72f81"
+          }
+        },
+        {
+          "client_id": "630482567435-p89fklgvovs9qr7571bi3b9qhesb4u1k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.finapay",
+            "certificate_hash": "8da410a0fb38c8ca253f042450a89e3c70439a6b"
+          }
+        },
+        {
           "client_id": "630482567435-4ck2eqarg55ua42v9g2d2gmj5kgphfv5.apps.googleusercontent.com",
           "client_type": 3
         }
