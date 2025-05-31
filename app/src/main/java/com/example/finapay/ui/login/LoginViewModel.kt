@@ -23,11 +23,11 @@ class LoginViewModel : ViewModel() {
     private val _loginError = MutableLiveData<String>()
     val loginError: LiveData<String> = _loginError
 
-    private val _forgotPasswordSuccess = MutableLiveData<String>()
-    val forgotPasswordSuccess: LiveData<String> = _forgotPasswordSuccess
+    private val _forgotPasswordSuccess = MutableLiveData<String?>()
+    val forgotPasswordSuccess: LiveData<String?> = _forgotPasswordSuccess
 
-    private val _forgotPasswordError = MutableLiveData<String>()
-    val forgotPasswordError: LiveData<String> = _forgotPasswordError
+    private val _forgotPasswordError = MutableLiveData<String?>()
+    val forgotPasswordError: LiveData<String?> = _forgotPasswordError
 
     fun signInGoogle(tokenId: String, fcmToken: String, context: Context) {
         repository.signInGoogle(tokenId, fcmToken)
@@ -115,6 +115,4 @@ class LoginViewModel : ViewModel() {
         _forgotPasswordSuccess.value = null
         _forgotPasswordError.value = null
     }
-
-
 }
