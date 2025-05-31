@@ -10,10 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.cardview.widget.CardView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -25,6 +27,8 @@ import com.example.finapay.data.models.LoanModel
 import com.example.finapay.data.models.PlafondModel
 import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
+import com.example.finapay.ui.adapter.PlafondAdapter
+import com.example.finapay.ui.landing.LandingViewModel
 import com.example.finapay.ui.my_account.MyAccountActivity
 import com.example.finapay.ui.request.RequestActivity
 import com.example.finapay.utils.CustomDialog
@@ -36,8 +40,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment() : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
+    private val landingViewModel: LandingViewModel by viewModels()
     private lateinit var adapterActiveLoan: ActiveLoanAdapter
     private lateinit var adapterPayment: PaymentAdapter
+    private lateinit var adapterPlafond: PlafondAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     // UI Components
@@ -55,12 +61,14 @@ class HomeFragment() : Fragment() {
     private lateinit var tvActiveLoan: TextView
     private lateinit var tvNextPayment: TextView
     private lateinit var tvOnGoingAmount: TextView
+    private lateinit var tvListPlafond: TextView
     private lateinit var ivSimulation: ImageView
     private lateinit var ivHistory: ImageView
     private lateinit var ivBill: ImageView
     private lateinit var ivRequest: ImageView
     private lateinit var rvActiveLoan: RecyclerView
     private lateinit var rvNextPayment: RecyclerView
+    private lateinit var rvPlafond: RecyclerView
     private lateinit var cardBackground: View
     private lateinit var cardOnGoing: CardView
 
@@ -90,6 +98,7 @@ class HomeFragment() : Fragment() {
         viewModel.getCustomerDetails()
         viewModel.getLoanHistory("approved")
         viewModel.getLoanOngoing()
+        landingViewModel.getPlafonds()
     }
 
     private fun initViews(view: View) {
@@ -97,6 +106,7 @@ class HomeFragment() : Fragment() {
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         adapterActiveLoan = ActiveLoanAdapter(mutableListOf())
         adapterPayment = PaymentAdapter(mutableListOf())
+        adapterPlafond = PlafondAdapter(mutableListOf())
 
         // Swipe Refresh Layout
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
@@ -117,6 +127,7 @@ class HomeFragment() : Fragment() {
         tvActiveLoan = view.findViewById(R.id.tv_active_loan)
         tvNextPayment = view.findViewById(R.id.tv_next_payment)
         tvOnGoingAmount = view.findViewById(R.id.tv_ongoing_amount)
+        tvListPlafond = view.findViewById(R.id.tv_list_plafond)
 
         // Image Views (Clickable buttons)
         ivSimulation = view.findViewById(R.id.iv_simulation)
@@ -127,6 +138,7 @@ class HomeFragment() : Fragment() {
         // Recycler Views
         rvActiveLoan = view.findViewById(R.id.rv_active_loan)
         rvNextPayment = view.findViewById(R.id.rv_next_payment)
+        rvPlafond = view.findViewById(R.id.rv_plafond)
 
         // Card Background
         cardBackground = view.findViewById(R.id.card_background)
@@ -161,6 +173,18 @@ class HomeFragment() : Fragment() {
             adapter = adapterPayment
         }
         shNextPayment.attachToRecyclerView(rvNextPayment)
+
+        // Plafond RecyclerView
+        val lmPlafond = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.HORIZONTAL,
+            false)
+        val shPlafond = PagerSnapHelper()
+        rvPlafond.apply {
+            layoutManager = lmPlafond
+            adapter = adapterPlafond
+        }
+        shPlafond.attachToRecyclerView(rvPlafond)
     }
 
     private fun setupListeners() {
@@ -208,18 +232,50 @@ class HomeFragment() : Fragment() {
             updateActiveLoanData(loans)
             updatePaymentData(loans)
             if (loans.size >= 1 ) {
+                sharedPreferencesHelper.saveLoanHistory(loans)
+                rvPlafond.visibility = View.GONE
+                tvListPlafond.visibility = View.GONE
                 tvActiveLoan.visibility = View.VISIBLE
                 tvNextPayment.visibility = View.VISIBLE
             } else {
+                sharedPreferencesHelper.clearLoanHistory()
+                landingViewModel.getPlafonds()
                 tvActiveLoan.visibility = View.GONE
                 tvNextPayment.visibility = View.GONE
             }
         }
 
         viewModel.loanHistoryError.observe(viewLifecycleOwner) { error ->
+            val cachedLoanHistory: List<LoanModel> = sharedPreferencesHelper.getLoanHistory()
+            if (cachedLoanHistory.isEmpty()) {
+                landingViewModel.getPlafonds()
+                tvActiveLoan.visibility = View.GONE
+                tvNextPayment.visibility = View.GONE
+            } else {
+                updateActiveLoanData(cachedLoanHistory)
+                updatePaymentData(cachedLoanHistory)
+                rvPlafond.visibility = View.GONE
+                tvListPlafond.visibility = View.GONE
+                tvActiveLoan.visibility = View.VISIBLE
+                tvNextPayment.visibility = View.VISIBLE
+            }
             stopShimmerActiveLoan()
-            tvActiveLoan.visibility = View.GONE
-            tvNextPayment.visibility = View.GONE
+        }
+
+        landingViewModel.plafonds.observe(viewLifecycleOwner) { plafonds ->
+            sharedPreferencesHelper.savePlafondList(plafonds)
+            adapterPlafond.updateData(plafonds)
+            rvPlafond.visibility = View.VISIBLE
+            tvListPlafond.visibility = View.VISIBLE
+        }
+
+        landingViewModel.plafondsError.observe(viewLifecycleOwner) { error ->
+            if (!error.isNullOrBlank()) {
+                val cachedPlafonds: List<PlafondModel> = sharedPreferencesHelper.getPlafondList()
+                adapterPlafond.updateData(cachedPlafonds)
+                rvPlafond.visibility = View.VISIBLE
+                tvListPlafond.visibility = View.VISIBLE
+            }
         }
 
         viewModel.loanOngoingSuccess.observe(viewLifecycleOwner) { loansOngoing ->
@@ -266,8 +322,6 @@ class HomeFragment() : Fragment() {
             showDataViews()
             canRequest = false
             onInternet = true
-            tvActiveLoan.visibility = View.GONE
-            tvNextPayment.visibility = View.GONE
         }
 
         viewModel.internetErrorError.observe(viewLifecycleOwner) { error ->
@@ -278,8 +332,6 @@ class HomeFragment() : Fragment() {
             showDataViews()
             canRequest = false
             onInternet = false
-            tvActiveLoan.visibility = View.GONE
-            tvNextPayment.visibility = View.GONE
         }
     }
 
@@ -359,6 +411,10 @@ class HomeFragment() : Fragment() {
 
     private fun updateActiveLoanData(loanModel: List<LoanModel>) {
         adapterActiveLoan.updateData(loanModel)
+    }
+
+    private fun updatePlafond(plafond: List<PlafondModel>) {
+        adapterPlafond.updateData(plafond)
     }
 
     private fun updatePaymentData(paymentModel: List<LoanModel>) {

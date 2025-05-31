@@ -453,7 +453,25 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_active_loan" />
-
+            <TextView
+                android:id="@+id/tv_list_plafond"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:text="Produk Kami"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <!-- Daftar Plafond -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_plafond"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:visibility="gone"
+                android:padding="8dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

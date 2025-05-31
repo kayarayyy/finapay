@@ -90,6 +90,27 @@ class SharedPreferencesHelper(context: Context) {
         return gson.fromJson(json, type)
     }
 
+    fun saveLoanHistory(loanHistory: List<LoanModel>) {
+        val json = gson.toJson(loanHistory)
+        with(sharedPreferences.edit()) {
+            putString("loanHistory", json)
+            apply()
+        }
+    }
+
+    fun getLoanHistory(): List<LoanModel> {
+        val json = sharedPreferences.getString("loanHistory", null) ?: return emptyList()
+        val type = object : TypeToken<List<LoanModel>>() {}.type
+        return gson.fromJson(json, type)
+    }
+
+    fun clearLoanHistory() {
+        with(sharedPreferences.edit()) {
+            remove("loanHistory")
+            apply()
+        }
+    }
+
     fun clearLoanOngoing() {
         with(sharedPreferences.edit()) {
             remove("loanOngoing")
