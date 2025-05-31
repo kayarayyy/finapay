@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.example.finapay.MainActivity
 import com.example.finapay.R
-import com.example.finapay.ui.change_passowrd.ChangePasswordActivity
+import com.example.finapay.ui.change_password.ChangePasswordActivity
 
 class SettingsActivity : AppCompatActivity() {
 

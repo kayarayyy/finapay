@@ -23,52 +23,98 @@ class LoginViewModel : ViewModel() {
     private val _loginError = MutableLiveData<String>()
     val loginError: LiveData<String> = _loginError
 
+    private val _forgotPasswordSuccess = MutableLiveData<String>()
+    val forgotPasswordSuccess: LiveData<String> = _forgotPasswordSuccess
+
+    private val _forgotPasswordError = MutableLiveData<String>()
+    val forgotPasswordError: LiveData<String> = _forgotPasswordError
+
     fun signInGoogle(tokenId: String, fcmToken: String, context: Context) {
-        repository.signInGoogle(tokenId, fcmToken).enqueue(object : Callback<ApiResponse<AuthModel>> {
+        repository.signInGoogle(tokenId, fcmToken)
+            .enqueue(object : Callback<ApiResponse<AuthModel>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<AuthModel>>,
+                    response: Response<ApiResponse<AuthModel>>
+                ) {
+                    if (response.isSuccessful) {
+                        val loginResponse = response.body()?.data
+                        loginResponse?.let {
+                            val sharedPreferencesHelper = SharedPreferencesHelper(context)
+                            sharedPreferencesHelper.saveUserData(it, fcmToken)
+                            _loginSuccess.postValue(it)
+                        }
+                    } else {
+                        val gson = Gson()
+                        val type = object : TypeToken<ApiResponse<AuthModel>>() {}.type
+                        val errorResponse: ApiResponse<AuthModel>? =
+                            gson.fromJson(response.errorBody()?.charStream(), type)
+                        _loginError.postValue(errorResponse?.message ?: "Terjadi kesalahan")
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
+                    _loginError.postValue("${t.localizedMessage}")
+                }
+            })
+    }
+
+    fun login(email: String, password: String, fcmToken: String, context: Context) {
+        repository.login(email, password, fcmToken)
+            .enqueue(object : Callback<ApiResponse<AuthModel>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<AuthModel>>,
+                    response: Response<ApiResponse<AuthModel>>
+                ) {
+                    if (response.isSuccessful) {
+                        val loginResponse = response.body()?.data
+                        loginResponse?.let {
+                            val sharedPreferencesHelper = SharedPreferencesHelper(context)
+                            sharedPreferencesHelper.saveUserData(it, fcmToken)
+                            _loginSuccess.postValue(it)
+                        }
+                    } else {
+                        val gson = Gson()
+                        val type = object : TypeToken<ApiResponse<AuthModel>>() {}.type
+                        val errorResponse: ApiResponse<AuthModel>? =
+                            gson.fromJson(response.errorBody()?.charStream(), type)
+                        _loginError.postValue(errorResponse?.message ?: "Terjadi kesalahan")
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
+                    _loginError.postValue("${t.localizedMessage}")
+                }
+            })
+    }
+
+    fun forgotPassword(email: String) {
+        repository.forgotPassword(email).enqueue(object : Callback<ApiResponse<String?>> {
             override fun onResponse(
-                call: Call<ApiResponse<AuthModel>>,
-                response: Response<ApiResponse<AuthModel>>
+                call: Call<ApiResponse<String?>>,
+                response: Response<ApiResponse<String?>>
             ) {
                 if (response.isSuccessful) {
-                    val loginResponse = response.body()?.data
-                    loginResponse?.let {
-                        val sharedPreferencesHelper = SharedPreferencesHelper(context)
-                        sharedPreferencesHelper.saveUserData(it, fcmToken)
-                        _loginSuccess.postValue(it)
+                    val body = response.body()
+                    if (body != null) {
+                        _forgotPasswordSuccess.postValue(body.message)
+                    } else {
+                        _forgotPasswordError.postValue("Respon kosong dari server")
                     }
                 } else {
-                    val gson = Gson()
-                    val type = object : TypeToken<ApiResponse<AuthModel>>() {}.type
-                    val errorResponse: ApiResponse<AuthModel>? = gson.fromJson(response.errorBody()?.charStream(), type)
-                    _loginError.postValue(errorResponse?.message ?: "Terjadi kesalahan")
+                    _forgotPasswordError.postValue("Gagal: ${response.code()} ${response.message()}")
                 }
             }
-            override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
-                _loginError.postValue("${t.localizedMessage}")
+
+            override fun onFailure(call: Call<ApiResponse<String?>>, t: Throwable) {
+                _forgotPasswordError.postValue("Kesalahan jaringan: Tidak dapat terhubung ke server")
             }
         })
     }
 
-    fun login(email: String, password: String, fcmToken: String, context: Context) {
-        repository.login(email, password, fcmToken).enqueue(object: Callback<ApiResponse<AuthModel>>{
-            override fun onResponse(call: Call<ApiResponse<AuthModel>>, response: retrofit2.Response<ApiResponse<AuthModel>>) {
-                if (response.isSuccessful) {
-                    val loginResponse = response.body()?.data
-                    loginResponse?.let {
-                        val sharedPreferencesHelper = SharedPreferencesHelper(context)
-                        sharedPreferencesHelper.saveUserData(it, fcmToken)
-                        _loginSuccess.postValue(it)
-                    }
-                } else {
-                    val gson = Gson()
-                    val type = object : TypeToken<ApiResponse<AuthModel>>() {}.type
-                    val errorResponse: ApiResponse<AuthModel>? = gson.fromJson(response.errorBody()?.charStream(), type)
-                    _loginError.postValue(errorResponse?.message ?: "Terjadi kesalahan")
-                }
-            }
-            override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
-                _loginError.postValue("${t.localizedMessage}")
-            }
-        })
+    fun clearForgotPasswordState() {
+        _forgotPasswordSuccess.value = null
+        _forgotPasswordError.value = null
     }
+
+
 }

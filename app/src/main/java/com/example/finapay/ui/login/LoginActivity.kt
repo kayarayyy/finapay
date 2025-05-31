@@ -1,5 +1,6 @@
 package com.example.finapay.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -12,6 +13,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.util.Log
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -22,6 +24,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.finapay.MainActivity
@@ -61,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var animation: Animation
 
     private lateinit var registerPrompt: TextView
+    private lateinit var tvForgotPassword: TextView
 
     private var registerButtonIsEnabled: Boolean = true
 
@@ -172,6 +176,7 @@ class LoginActivity : AppCompatActivity() {
         bgWave = findViewById(R.id.bgWave)
         bgWave1 = findViewById(R.id.bgWave1)
         registerPrompt = findViewById(R.id.tvRegisterPrompt)
+        tvForgotPassword = findViewById(R.id.tvForgotPassword)
         animation = Animation()
         animation.animationslidebottom(bgWave)
         animation.animationslidebottom(bgWave1, 550)
@@ -239,6 +244,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupListener() {
+        tvForgotPassword.setOnClickListener {
+            showEmailInputDialog(this)
+        }
         loginGoogleButton.setOnClickListener {
             disableView()
             loginProgress.visibility = View.VISIBLE
@@ -332,6 +340,34 @@ class LoginActivity : AppCompatActivity() {
                 )
             }
         }
+
+//        viewModel.forgotPasswordError.observe(this) { errorMessage ->
+//            errorMessage?.let {
+//                CustomDialog.show(
+//                    context = this,
+//                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
+//                    iconColor = R.color.red,
+//                    title = "Gagal!",
+//                    message = it,
+//                    primaryButtonText = "OK",
+//                    primaryButtonBackgroundRes = R.drawable.color_button_red
+//                )
+//            }
+//        }
+//
+//        viewModel.forgotPasswordSuccess.observe(this) { successMessage ->
+//            successMessage?.let {
+//                CustomDialog.show(
+//                    context = this,
+//                    iconRes = R.drawable.ic_outline_check_circle_24,
+//                    iconColor = R.color.blue,
+//                    title = "Berhasil!",
+//                    message = it,
+//                    primaryButtonText = "OK",
+//                    primaryButtonBackgroundRes = R.drawable.color_button_blue
+//                )
+//            }
+//        }
     }
 
     private fun getFCMToken(onTokenReceived: (String?) -> Unit) {
@@ -359,4 +395,87 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun showEmailInputDialog(context: Context) {
+        val inputView = LayoutInflater.from(context).inflate(R.layout.dialog_input_email, null)
+        val etEmail = inputView.findViewById<EditText>(R.id.etEmailInput)
+        val btnPrimary = inputView.findViewById<Button>(R.id.btnPrimary)
+        val btnSecondary = inputView.findViewById<Button>(R.id.btnSecondary)
+        val icon = inputView.findViewById<ImageView>(R.id.dialogIcon)
+        val progressBar = inputView.findViewById<ProgressBar>(R.id.btnProgressBar)
+
+        btnSecondary.backgroundTintList = null
+        btnPrimary.backgroundTintList = null
+        icon.setImageResource(R.drawable.ic_outline_email_24)
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(inputView)
+            .setCancelable(false) // tidak bisa dismiss via tap luar/back saat loading
+            .create()
+
+        dialog.setCanceledOnTouchOutside(false) // tidak bisa dismiss via tap luar
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        fun setLoading(isLoading: Boolean) {
+            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            btnPrimary.isEnabled = !isLoading
+            btnSecondary.isEnabled = !isLoading
+            btnSecondary.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+            dialog.setCancelable(!isLoading)
+            dialog.setCanceledOnTouchOutside(!isLoading)
+        }
+
+        btnPrimary.setOnClickListener {
+            val email = etEmail.text.toString().trim()
+            if (email.isNotEmpty()) {
+                setLoading(true)
+                etEmail.isEnabled = false
+                viewModel.forgotPassword(email)
+            } else {
+                Toast.makeText(context, "Email tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnSecondary.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        viewModel.forgotPasswordSuccess.observeForever { message ->
+            message?.let {
+                setLoading(false)
+                etEmail.isEnabled = true
+                dialog.dismiss()
+                CustomDialog.show(
+                    context = context,
+                    iconRes = R.drawable.ic_outline_check_circle_24,
+                    iconColor = R.color.blue,
+                    title = "Berhasil!",
+                    message = it,
+                    primaryButtonText = "OK",
+                    primaryButtonBackgroundRes = R.drawable.color_button_blue
+                )
+                viewModel.clearForgotPasswordState()
+            }
+        }
+
+        viewModel.forgotPasswordError.observeForever { error ->
+            error?.let {
+                setLoading(false)
+                etEmail.isEnabled = true
+                CustomDialog.show(
+                    context = context,
+                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
+                    iconColor = R.color.red,
+                    title = "Gagal!",
+                    message = it,
+                    primaryButtonText = "OK",
+                    primaryButtonBackgroundRes = R.drawable.color_button_red
+                )
+                viewModel.clearForgotPasswordState()
+            }
+        }
+
+        dialog.show()
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.finapay.data.sources.remote
 import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.models.AuthModel
 import com.example.finapay.data.models.requests.ChangePasswordRequest
+import com.example.finapay.data.models.requests.ForgotPasswordRequest
 import com.example.finapay.data.models.requests.GoogleSignInRequest
 import com.example.finapay.data.models.requests.LoginRequest
 import com.example.finapay.data.models.requests.RegisterRequest
@@ -22,6 +23,9 @@ interface AuthService {
 
     @POST("auth/register")
     fun register(@Body registerRequest: RegisterRequest): Call<ApiResponse<AuthModel>>
+
+    @POST("auth/reset-password")
+    fun forgotPassword(@Body forgotPasswordRequest: ForgotPasswordRequest): Call<ApiResponse<String?>>
 
     @PUT("auth/change-password")
     fun changePassword(@Body changePasswordRequest: ChangePasswordRequest): Call<ApiResponse<Boolean?>>

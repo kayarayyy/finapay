@@ -1,14 +1,11 @@
-package com.example.finapay.ui.change_passowrd
+package com.example.finapay.ui.change_password
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.finapay.data.models.AuthModel
-import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.data.models.response.ApiResponse
 import com.example.finapay.data.repositories.AuthRepository
-import com.example.finapay.ui.my_account.MyAccountViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
