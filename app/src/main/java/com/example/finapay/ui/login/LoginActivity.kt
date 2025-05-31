@@ -85,15 +85,22 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     enableView()
                     loginProgress.visibility = View.GONE
+//                    Toast.makeText(this, "Token ID tidak tersedia", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: ApiException) {
                 enableView()
                 loginProgress.visibility = View.GONE
                 Log.e("GoogleLogin", "Login gagal, code=${e.statusCode}", e)
+//                Toast.makeText(
+//                    this,
+//                    "Login Google gagal: ${e.localizedMessage}",
+//                    Toast.LENGTH_SHORT
+//                ).show()
             }
         } else {
             enableView()
             loginProgress.visibility = View.GONE
+
             Log.e("GoogleLogin", "Login dibatalkan oleh pengguna.")
         }
     }
@@ -286,7 +293,7 @@ class LoginActivity : AppCompatActivity() {
                     context = this,
                     iconRes = R.drawable.ic_outline_cancel_presentation_24,
                     title = "Login Gagal!",
-                    message = errorMessage,
+                    message = "Terjadi kesalahan saat login. Silakan coba lagi.",
                     primaryButtonText = "OK",
                     primaryButtonBackgroundRes = R.drawable.color_button_red,
                     iconColor = R.color.red
