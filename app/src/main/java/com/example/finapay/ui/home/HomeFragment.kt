@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -63,7 +64,7 @@ class HomeFragment() : Fragment() {
     private lateinit var tvOnGoingAmount: TextView
     private lateinit var tvListPlafond: TextView
     private lateinit var ivSimulation: ImageView
-    private lateinit var ivHistory: ImageView
+    private lateinit var ivPlafond: ImageView
     private lateinit var ivBill: ImageView
     private lateinit var ivRequest: ImageView
     private lateinit var rvActiveLoan: RecyclerView
@@ -71,6 +72,7 @@ class HomeFragment() : Fragment() {
     private lateinit var rvPlafond: RecyclerView
     private lateinit var cardBackground: View
     private lateinit var cardOnGoing: CardView
+    private lateinit var btnNotification: ImageButton
 
     private var canRequest: Boolean? = false
     private var onInternet: Boolean? = false
@@ -131,9 +133,10 @@ class HomeFragment() : Fragment() {
 
         // Image Views (Clickable buttons)
         ivSimulation = view.findViewById(R.id.iv_simulation)
-        ivHistory = view.findViewById(R.id.iv_history)
+        ivPlafond = view.findViewById(R.id.iv_plafond)
         ivBill = view.findViewById(R.id.iv_bill)
         ivRequest = view.findViewById(R.id.iv_request)
+        btnNotification = view.findViewById(R.id.ib_notification)
 
         // Recycler Views
         rvActiveLoan = view.findViewById(R.id.rv_active_loan)
@@ -198,17 +201,21 @@ class HomeFragment() : Fragment() {
             viewModel.getLoanOngoing()
         }
 
+        btnNotification.setOnClickListener{
+            showFeatureNotAvailableDialog("Notifikasi")
+        }
+
         // Simulation Button Listener
         ivSimulation.setOnClickListener {
-            showFeatureNotAvailableDialog("simulasi")
+            showFeatureNotAvailableDialog("Simulasi")
         }
 
         ivBill.setOnClickListener {
-            showFeatureNotAvailableDialog("tagihan")
+            showFeatureNotAvailableDialog("Tagihan")
         }
 
-        ivHistory.setOnClickListener {
-            showFeatureNotAvailableDialog("riwayat")
+        ivPlafond.setOnClickListener {
+            showFeatureNotAvailableDialog("Plafond")
         }
 
         // Request Button Listener

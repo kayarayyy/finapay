@@ -16,6 +16,7 @@ import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -105,6 +106,7 @@ class MyAccountActivity : AppCompatActivity() {
     private lateinit var genderRadioGroup: RadioGroup
     private lateinit var genderMaleRadioButton: RadioButton
     private lateinit var genderFemaleRadioButton: RadioButton
+    private lateinit var btnBack: ImageButton
 
     // Views: Button
     private lateinit var refreshLocationButton: MaterialButton
@@ -378,6 +380,7 @@ class MyAccountActivity : AppCompatActivity() {
         uploadSelfieButton = findViewById(R.id.upload_selfie_ktp_button)
         uploadHouseButton = findViewById(R.id.upload_house_button)
         submitButton = findViewById(R.id.submit_button)
+        btnBack = findViewById(R.id.btn_back)
         genderRadioGroup = findViewById(R.id.gender_group)
         genderMaleRadioButton = findViewById(R.id.gender_male)
         genderFemaleRadioButton = findViewById(R.id.gender_female)
@@ -494,6 +497,13 @@ class MyAccountActivity : AppCompatActivity() {
     }
 
     private fun setupListener(){
+        btnBack.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("destination", "profile")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
+
         genderRadioGroup.setOnCheckedChangeListener { group, checkedId ->
             val blueColor = ContextCompat.getColorStateList(this, R.color.blue)
             val grayColor = ContextCompat.getColorStateList(this, R.color.gray)

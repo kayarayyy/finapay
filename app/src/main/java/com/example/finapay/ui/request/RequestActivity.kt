@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -40,7 +41,6 @@ import java.util.Locale
 class RequestActivity : AppCompatActivity() {
 
     private val viewModel: RequestViewModel by viewModels()
-    private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var formUtils: FormUtils
 
@@ -58,6 +58,7 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var tenor24: RadioButton
     private lateinit var refreshLocationButton: MaterialButton
     private lateinit var submitButton: MaterialButton
+    private lateinit var btnBack: ImageButton
 
     // Preview Components
     private lateinit var previewCard: CardView
@@ -79,13 +80,6 @@ class RequestActivity : AppCompatActivity() {
     private var isEditing = false
     private var submitButtonEnabled = true
 
-    // Loan calculation constants
-//    companion object {
-//        private const val ADMIN_FEE_PERCENTAGE = 0.05 // 5%
-//        private const val INTEREST_RATE_6_MONTHS = 0.02 // 2% per month
-//        private const val INTEREST_RATE_12_MONTHS = 0.018 // 1.8% per month
-//        private const val INTEREST_RATE_24_MONTHS = 0.015 // 1.5% per month
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,6 +115,7 @@ class RequestActivity : AppCompatActivity() {
         tenor24 = findViewById(R.id.tenor_24)
         refreshLocationButton = findViewById(R.id.refresh_location_button)
         submitButton = findViewById(R.id.submit_button)
+        btnBack = findViewById(R.id.btn_back)
         progressBar = findViewById(R.id.loading_indicator)
 
         // Preview Components
@@ -229,6 +224,12 @@ class RequestActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        btnBack.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("destination", "home")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
         amountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}

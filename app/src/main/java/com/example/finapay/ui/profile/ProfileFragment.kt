@@ -34,7 +34,6 @@ class ProfileFragment : Fragment() {
 
         // Initialize Views
         val btnLogout = view.findViewById<Button>(R.id.btn_logout)
-        val btnChangeAvatar = view.findViewById<Button>(R.id.btn_change_avatar)
         val tvName = view.findViewById<TextView>(R.id.tv_name)
         val tvEmail = view.findViewById<TextView>(R.id.tv_email)
         val layoutAccount = view.findViewById<LinearLayout>(R.id.tv_account)
@@ -42,7 +41,6 @@ class ProfileFragment : Fragment() {
 
         // Ensure button tint is not altered
         btnLogout.backgroundTintList = null
-        btnChangeAvatar.backgroundTintList = null
 
         // Observe data from ViewModel
         viewModel.name.observe(viewLifecycleOwner) { name ->
