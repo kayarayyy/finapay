@@ -37,6 +37,12 @@ class HomeViewModel @Inject constructor(
     private val _loanHistoryError = MutableLiveData<ApiResponse<String>>()
     val loanHistoryError: LiveData<ApiResponse<String>> = _loanHistoryError
 
+    private val _loanOngoingSuccess = MutableLiveData<List<LoanModel>>()
+    val loanOngoingSuccess: LiveData<List<LoanModel>> = _loanOngoingSuccess
+
+    private val _loanOngoingError = MutableLiveData<ApiResponse<String>>()
+    val loanOngoingError: LiveData<ApiResponse<String>> = _loanOngoingError
+
     fun getLoanHistory(status: String) {
         viewModelScope.launch {
             try {
@@ -50,6 +56,25 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _loanHistoryError.postValue(
+                    ApiResponse("failed", "Terjadi kesalahan: ${e.message}", "", 500)
+                )
+            }
+        }
+    }
+
+    fun getLoanOngoing() {
+        viewModelScope.launch {
+            try {
+                val response = loanRepository.getAllLoanRequestByEmailAndStatus("ongoing")
+                if (response.status == "success") {
+                    _loanOngoingSuccess.postValue(response.data)
+                } else {
+                    _loanOngoingError.postValue(
+                        ApiResponse("failed", response.message ?: "Gagal mengambil data", "", response.status_code)
+                    )
+                }
+            } catch (e: Exception) {
+                _loanOngoingError.postValue(
                     ApiResponse("failed", "Terjadi kesalahan: ${e.message}", "", 500)
                 )
             }

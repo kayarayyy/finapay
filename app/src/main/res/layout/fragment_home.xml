@@ -201,6 +201,7 @@
                 </androidx.cardview.widget.CardView>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+
             <!-- Main Menu -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -216,112 +217,172 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:orientation="vertical">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_ongoing_request"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@color/light_yellow"
+                        app:shapeAppearanceOverlay="@style/TopRoundedCardShape">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="4dp"
+                            android:gravity="center_vertical">
+
+                            <!-- Icon jam -->
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_outline_access_time_24"
+                                app:tint="@color/black" />
+
+                            <!-- Text pengajuan -->
+                            <TextView
+                                android:id="@+id/tv_ongoing_request"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:text="Proses Pengajuan..."
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
+
+                            <!-- Nominal pengajuan -->
+                            <TextView
+                                android:id="@+id/tv_ongoing_amount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:textColor="@color/black"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <!-- Icon chevron kanan -->
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_rounded_chevron_forward_24"
+                                app:tint="@color/black" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
                     <LinearLayout
-                        android:id="@+id/btn_new_loan"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                        <ImageView
-                            android:id="@+id/iv_request"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_circle_light_blue"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_outline_add_card_24" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:id="@+id/btn_new_loan"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Ajukan"
-                            android:textColor="#333333"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                    <LinearLayout
-                        android:id="@+id/btn_history"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                            <ImageView
+                                android:id="@+id/iv_request"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_light_blue"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_outline_add_card_24" />
 
-                        <ImageView
-                            android:id="@+id/iv_history"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_circle_light_blue"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_outline_access_time_24" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Ajukan"
+                                android:textColor="#333333"
+                                android:textSize="12sp" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:id="@+id/btn_history"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Riwayat"
-                            android:textColor="#333333"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                    <LinearLayout
-                        android:id="@+id/btn_bill"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                            <ImageView
+                                android:id="@+id/iv_history"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_light_blue"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_outline_beenhere_24" />
 
-                        <ImageView
-                            android:id="@+id/iv_bill"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_circle_light_blue"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_baseline_attach_money_24" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Plafond"
+                                android:textColor="#333333"
+                                android:textSize="12sp" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:id="@+id/btn_bill"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Tagihan"
-                            android:textColor="#333333"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                            <ImageView
+                                android:id="@+id/iv_bill"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_light_blue"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_baseline_attach_money_24" />
 
-                        <ImageView
-                            android:id="@+id/iv_simulation"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/bg_circle_light_blue"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_outline_assignment_24" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Tagihan"
+                                android:textColor="#333333"
+                                android:textSize="12sp" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Simulasi"
-                            android:textColor="#333333"
-                            android:textSize="12sp" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_simulation"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_light_blue"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="12dp"
+                                android:src="@drawable/ic_outline_assignment_24" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Simulasi"
+                                android:textColor="#333333"
+                                android:textSize="12sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
+
+
             </androidx.cardview.widget.CardView>
 
             <!-- Next Payment -->

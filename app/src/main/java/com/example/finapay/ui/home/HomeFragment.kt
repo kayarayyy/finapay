@@ -4,11 +4,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -20,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.finapay.R
 import com.example.finapay.data.models.CustomerDetailModel
 import com.example.finapay.data.models.LoanModel
+import com.example.finapay.data.models.PlafondModel
 import com.example.finapay.ui.adapter.ActiveLoanAdapter
 import com.example.finapay.ui.adapter.PaymentAdapter
 import com.example.finapay.ui.my_account.MyAccountActivity
@@ -51,6 +54,7 @@ class HomeFragment() : Fragment() {
     private lateinit var tvAvailablePlafond: TextView
     private lateinit var tvActiveLoan: TextView
     private lateinit var tvNextPayment: TextView
+    private lateinit var tvOnGoingAmount: TextView
     private lateinit var ivSimulation: ImageView
     private lateinit var ivHistory: ImageView
     private lateinit var ivBill: ImageView
@@ -58,6 +62,7 @@ class HomeFragment() : Fragment() {
     private lateinit var rvActiveLoan: RecyclerView
     private lateinit var rvNextPayment: RecyclerView
     private lateinit var cardBackground: View
+    private lateinit var cardOnGoing: CardView
 
     private var canRequest: Boolean? = false
     private var onInternet: Boolean? = false
@@ -84,6 +89,7 @@ class HomeFragment() : Fragment() {
 
         viewModel.getCustomerDetails()
         viewModel.getLoanHistory("approved")
+        viewModel.getLoanOngoing()
     }
 
     private fun initViews(view: View) {
@@ -110,6 +116,7 @@ class HomeFragment() : Fragment() {
         tvAvailablePlafond = view.findViewById(R.id.tv_available_plafond)
         tvActiveLoan = view.findViewById(R.id.tv_active_loan)
         tvNextPayment = view.findViewById(R.id.tv_next_payment)
+        tvOnGoingAmount = view.findViewById(R.id.tv_ongoing_amount)
 
         // Image Views (Clickable buttons)
         ivSimulation = view.findViewById(R.id.iv_simulation)
@@ -123,6 +130,7 @@ class HomeFragment() : Fragment() {
 
         // Card Background
         cardBackground = view.findViewById(R.id.card_background)
+        cardOnGoing = view.findViewById(R.id.card_ongoing_request)
     }
 
     private fun setupRecyclerViews() {
@@ -163,6 +171,7 @@ class HomeFragment() : Fragment() {
             onInternet = true
             viewModel.getCustomerDetails()
             viewModel.getLoanHistory("approved")
+            viewModel.getLoanOngoing()
         }
 
         // Simulation Button Listener
@@ -201,12 +210,37 @@ class HomeFragment() : Fragment() {
             if (loans.size >= 1 ) {
                 tvActiveLoan.visibility = View.VISIBLE
                 tvNextPayment.visibility = View.VISIBLE
+            } else {
+                tvActiveLoan.visibility = View.GONE
+                tvNextPayment.visibility = View.GONE
             }
         }
+
         viewModel.loanHistoryError.observe(viewLifecycleOwner) { error ->
             stopShimmerActiveLoan()
             tvActiveLoan.visibility = View.GONE
             tvNextPayment.visibility = View.GONE
+        }
+
+        viewModel.loanOngoingSuccess.observe(viewLifecycleOwner) { loansOngoing ->
+            if (loansOngoing.isEmpty()) {
+                sharedPreferencesHelper.clearLoanOngoing()
+                cardOnGoing.visibility = View.GONE
+            } else {
+                sharedPreferencesHelper.saveLoanOngoing(loansOngoing)
+                tvOnGoingAmount.text = loansOngoing.firstOrNull()?.amount
+                cardOnGoing.visibility = View.VISIBLE
+            }
+        }
+        viewModel.loanOngoingError.observe(viewLifecycleOwner) { error ->
+            val cachedLoanOngoing: List<LoanModel> = sharedPreferencesHelper.getLoanOngoing()
+            if (cachedLoanOngoing.isEmpty()) {
+                cardOnGoing.visibility = View.GONE
+            } else {
+                tvOnGoingAmount.text = cachedLoanOngoing.firstOrNull()?.amount
+                cardOnGoing.visibility = View.VISIBLE
+            }
+
         }
 
         // Success Observer
@@ -215,6 +249,7 @@ class HomeFragment() : Fragment() {
 
             setupCardBackground(customer)
             updateUserInfo(customer)
+            sharedPreferencesHelper.saveCustomerDetail(customer)
 
             stopShimmerAnimation()
             showDataViews()
@@ -227,7 +262,7 @@ class HomeFragment() : Fragment() {
             swipeRefreshLayout.isRefreshing = false
 
             stopShimmerAnimation()
-            setErrorStateData()
+            setDataFromCache()
             showDataViews()
             canRequest = false
             onInternet = true
@@ -237,8 +272,9 @@ class HomeFragment() : Fragment() {
 
         viewModel.internetErrorError.observe(viewLifecycleOwner) { error ->
             swipeRefreshLayout.isRefreshing = false
+
             stopShimmerAnimation()
-            setErrorStateData()
+            setDataFromCache()
             showDataViews()
             canRequest = false
             onInternet = false
@@ -336,12 +372,18 @@ class HomeFragment() : Fragment() {
         tvUserName.setText(customer.user?.name)
     }
 
-    private fun setErrorStateData() {
-        tvTotalPlafond.setText("-")
-        tvUsedPlafond.setText("Terpakai: Rp -")
-        tvAvailablePlafond.setText("Rp -")
-
+    private fun setDataFromCache() {
+        val cachedCustomerDetails: CustomerDetailModel? = sharedPreferencesHelper.getCustomerDetail()
         val user = sharedPreferencesHelper.getUserData()
+
+        if (cachedCustomerDetails != null) {
+            updateUserInfo(cachedCustomerDetails)
+            setupCardBackground(cachedCustomerDetails)
+        } else {
+            tvTotalPlafond.setText("-")
+            tvUsedPlafond.setText("Terpakai: Rp -")
+            tvAvailablePlafond.setText("Rp -")
+        }
         tvUserName.setText(user?.name ?: "-")
     }
 

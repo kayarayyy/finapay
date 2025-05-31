@@ -41,6 +41,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.example.finapay.utils.FormUtils
+import com.example.finapay.utils.SharedPreferencesHelper
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -53,6 +54,9 @@ class MyAccountActivity : AppCompatActivity() {
     // ViewModel
     private val viewModel: MyAccountViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
+
+    //    Shared Preferences
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     // Utils
     private lateinit var formUtils: FormUtils
@@ -197,7 +201,12 @@ class MyAccountActivity : AppCompatActivity() {
             disableView()
         }
         homeViewModel.customerDetailsError.observe(this) {
-            enableView()
+            val cachedCustomerDetails: CustomerDetailModel? = sharedPreferencesHelper.getCustomerDetail()
+            if (cachedCustomerDetails != null) {
+                fetchCustomerDetails(cachedCustomerDetails)
+            } else {
+                enableView()
+            }
         }
     }
 
@@ -332,6 +341,7 @@ class MyAccountActivity : AppCompatActivity() {
 
     private fun initViews() {
         formUtils = FormUtils()
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
         headerTitleTextView = findViewById(R.id.header_title)
         headerDescriptionTextView = findViewById(R.id.header_description)
         progressBar = findViewById(R.id.loading_indicator)

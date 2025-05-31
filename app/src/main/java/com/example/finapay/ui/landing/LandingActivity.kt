@@ -16,16 +16,19 @@ import com.example.finapay.R
 import com.example.finapay.data.models.PlafondModel
 import com.example.finapay.ui.adapter.PlafondAdapter
 import com.example.finapay.ui.login.LoginActivity
+import com.example.finapay.utils.SharedPreferencesHelper
 import com.facebook.shimmer.ShimmerFrameLayout
 
 class LandingActivity : AppCompatActivity() {
     private val viewModel: LandingViewModel by viewModels()
     private lateinit var adapter: PlafondAdapter
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_FINAPay)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_landing)
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
 
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_plafond)
@@ -51,9 +54,9 @@ class LandingActivity : AppCompatActivity() {
 
         btnLogin.backgroundTintList = null
 
-        // Observasi data dari ViewModel
         viewModel.plafonds.observe(this) { plafonds ->
             adapter.updateData(plafonds)
+            sharedPreferencesHelper.savePlafondList(plafonds)
             shimmerLayout.stopShimmer()
             shimmerLayout.visibility = View.GONE
             recyclerView.visibility = View.VISIBLE
@@ -61,17 +64,27 @@ class LandingActivity : AppCompatActivity() {
             swipeRefreshLayout.isRefreshing = false
         }
 
-        // Error handling untuk kegagalan memuat data
         viewModel.plafondsError.observe(this) { error ->
             if (!error.isNullOrBlank()) {
-                Toast.makeText(this, "Gagal memuat data: $error", Toast.LENGTH_LONG).show()
-                shimmerLayout.startShimmer()
-                shimmerLayout.visibility = View.VISIBLE
-                recyclerView.visibility = View.GONE
-                tvReloadHint.visibility = View.VISIBLE
+                val cachedPlafonds: List<PlafondModel> = sharedPreferencesHelper.getPlafondList()
+                adapter.updateData(cachedPlafonds)
+
+                if (cachedPlafonds.isEmpty()) {
+                    shimmerLayout.startShimmer()
+                    shimmerLayout.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                    tvReloadHint.visibility = View.VISIBLE
+                } else {
+                    shimmerLayout.stopShimmer()
+                    shimmerLayout.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    tvReloadHint.visibility = View.GONE
+                }
+
             }
             swipeRefreshLayout.isRefreshing = false
         }
+
 
         // Panggil data
         viewModel.getPlafonds()

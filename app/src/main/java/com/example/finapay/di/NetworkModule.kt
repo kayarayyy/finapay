@@ -21,8 +21,8 @@ object NetworkModule {
 
 
     //    private const val BASE_URL = "http://localhost:8080/api/v1/"
-    private const val BASE_URL = "http://34.60.203.63/api/v1/"
-//    private const val BASE_URL = "https://d9fe-180-252-121-38.ngrok-free.app/api/v1/"
+//    private const val BASE_URL = "http://34.60.203.63/api/v1/"
+    private const val BASE_URL = "https://21a2-180-252-121-208.ngrok-free.app/api/v1/"
 
     @Provides
     @Singleton

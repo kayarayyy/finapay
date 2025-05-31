@@ -29,7 +29,7 @@ class LandingViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val plafondsResponse = response.body()?.data
                     if (plafondsResponse != null) {
-                        _plafondsSuccess.postValue(plafondsResponse)
+                        _plafondsSuccess.postValue(plafondsResponse!!)
                     } else {
                         _plafondsError.postValue("Data tidak ditemukan.")
                     }
