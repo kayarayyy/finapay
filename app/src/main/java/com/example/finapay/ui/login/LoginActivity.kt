@@ -15,6 +15,7 @@ import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
@@ -34,6 +35,7 @@ import com.example.finapay.ui.animation.Animation
 import com.example.finapay.ui.register.RegisterActivity
 import com.example.finapay.utils.CustomDialog
 import com.example.finapay.utils.FormUtils
+import com.example.finapay.utils.SharedPreferencesHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -48,6 +50,7 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels()
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var formUtils: FormUtils
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     private lateinit var emailInput: TextInputEditText
     private lateinit var passwordInput: TextInputEditText
@@ -150,6 +153,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         setContentView(R.layout.activity_login)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         askNotificationPermission()
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -166,6 +171,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initViews() {
         formUtils = FormUtils()
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
         emailInputLayout = findViewById(R.id.etEmailLayout)
         passwordInputLayout = findViewById(R.id.etPasswordLayout)
         emailInput = findViewById(R.id.etEmail)
@@ -248,6 +254,7 @@ class LoginActivity : AppCompatActivity() {
             showEmailInputDialog(this)
         }
         loginGoogleButton.setOnClickListener {
+            sharedPreferencesHelper.clearUserData()
             disableView()
             loginProgress.visibility = View.VISIBLE
 
@@ -260,6 +267,7 @@ class LoginActivity : AppCompatActivity() {
 
         loginButton.setOnClickListener {
             if (!validateForm()) return@setOnClickListener
+            sharedPreferencesHelper.clearUserData()
             disableView()
             loginProgress.visibility = View.VISIBLE
 
@@ -333,41 +341,13 @@ class LoginActivity : AppCompatActivity() {
                     context = this,
                     iconRes = R.drawable.ic_outline_cancel_presentation_24,
                     title = "Login Gagal!",
-                    message = "Terjadi kesalahan saat login. Silakan coba lagi.",
+                    message = errorMessage,
                     primaryButtonText = "OK",
                     primaryButtonBackgroundRes = R.drawable.color_button_red,
                     iconColor = R.color.red
                 )
             }
         }
-
-//        viewModel.forgotPasswordError.observe(this) { errorMessage ->
-//            errorMessage?.let {
-//                CustomDialog.show(
-//                    context = this,
-//                    iconRes = R.drawable.ic_outline_cancel_presentation_24,
-//                    iconColor = R.color.red,
-//                    title = "Gagal!",
-//                    message = it,
-//                    primaryButtonText = "OK",
-//                    primaryButtonBackgroundRes = R.drawable.color_button_red
-//                )
-//            }
-//        }
-//
-//        viewModel.forgotPasswordSuccess.observe(this) { successMessage ->
-//            successMessage?.let {
-//                CustomDialog.show(
-//                    context = this,
-//                    iconRes = R.drawable.ic_outline_check_circle_24,
-//                    iconColor = R.color.blue,
-//                    title = "Berhasil!",
-//                    message = it,
-//                    primaryButtonText = "OK",
-//                    primaryButtonBackgroundRes = R.drawable.color_button_blue
-//                )
-//            }
-//        }
     }
 
     private fun getFCMToken(onTokenReceived: (String?) -> Unit) {

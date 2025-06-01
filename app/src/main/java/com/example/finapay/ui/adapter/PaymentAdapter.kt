@@ -47,7 +47,7 @@ class PaymentAdapter(private var items: MutableList<LoanModel>) :
             } else {
                 // Tambahkan 1 bulan dari hari ini
                 time = today.time
-                add(Calendar.MONTH, 1)
+                add(Calendar.MONTH, 2)
             }
         }
 

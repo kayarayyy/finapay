@@ -53,7 +53,7 @@ class LoginViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
-                    _loginError.postValue("${t.localizedMessage}")
+                    _loginError.postValue("Kesalahan jaringan: Tidak dapat terhubung ke server")
                 }
             })
     }
@@ -82,7 +82,7 @@ class LoginViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<ApiResponse<AuthModel>>, t: Throwable) {
-                    _loginError.postValue("${t.localizedMessage}")
+                    _loginError.postValue("Kesalahan jaringan: Tidak dapat terhubung ke server")
                 }
             })
     }
