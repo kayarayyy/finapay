@@ -21,7 +21,7 @@ object NetworkModule {
 
 
     //    private const val BASE_URL = "http://localhost:8080/api/v1/"
-    private const val BASE_URL = "http://34.60.203.63/api/v1/"
+    private const val BASE_URL = "http://34.60.136.102/api/v1/"
 //    private const val BASE_URL = "https://1f8c-180-252-119-137.ngrok-free.app/api/v1/"
 
     @Provides
